@@ -204,3 +204,168 @@ def get_index_stats(db_path: Path) -> dict:
         }
     finally:
         conn.close()
+
+
+def get_page_context(page_path: Path, match_line: int, context_lines: int) -> list[str]:
+    """Get surrounding lines from a page around a match.
+
+    Args:
+        page_path: Path to the markdown file.
+        match_line: 1-indexed line number of the match.
+        context_lines: Number of lines to include before and after.
+
+    Returns:
+        List of lines including context around the match.
+    """
+    try:
+        content = page_path.read_text(encoding="utf-8")
+        lines = content.splitlines()
+
+        start = max(0, match_line - 1 - context_lines)
+        end = min(len(lines), match_line + context_lines)
+
+        return lines[start:end]
+    except Exception:
+        return []
+
+
+def format_search_results(
+    results: list[dict],
+    context_lines: int = 3,
+    format_type: str = "text",
+) -> str:
+    """Format search results for output.
+
+    Args:
+        results: List of search result dictionaries.
+        context_lines: Number of context lines (for text format).
+        format_type: Output format - 'text', 'json', or 'table'.
+
+    Returns:
+        Formatted string output.
+    """
+    import json
+
+    if format_type == "json":
+        return json.dumps(results, indent=2)
+
+    elif format_type == "table":
+        from rich.console import Console
+        from rich.table import Table
+
+        console = Console()
+        table = Table(title="Search Results")
+        table.add_column("Type", style="cyan")
+        table.add_column("Title", style="green")
+        table.add_column("Path")
+        table.add_column("Snippet")
+
+        for r in results:
+            table.add_row(
+                r.get("type", ""),
+                r.get("title", ""),
+                r.get("path", ""),
+                r.get("snippet", "")[:60] + "..." if len(r.get("snippet", "")) > 60 else r.get("snippet", ""),
+            )
+
+        with console.capture() as capture:
+            console.print(table)
+        return capture.get()
+
+    else:  # text format
+        output_lines = []
+        for r in results:
+            output_lines.append(f"[{r.get('type', 'unknown')}] {r.get('title', '')}")
+            output_lines.append(f"  Path: {r.get('path', '')}")
+            if r.get("snippet"):
+                output_lines.append(f"  {r['snippet']}")
+            output_lines.append("")
+        return "\n".join(output_lines)
+
+
+def list_wiki_pages(wiki_dir: Path, scope: str = "all") -> list[dict]:
+    """List all wiki pages with metadata.
+
+    Args:
+        wiki_dir: Path to wiki/ directory.
+        scope: Filter by type - 'entity', 'concept', or 'all'.
+
+    Returns:
+        List of dictionaries with:
+        - path: File path relative to wiki root
+        - title: Page title (from frontmatter or first heading)
+        - type: 'entity' or 'concept'
+    """
+    results = []
+
+    # Check entities
+    if scope in ("entity", "all"):
+        entities_dir = wiki_dir / "entities"
+        if entities_dir.exists():
+            for md_file in entities_dir.glob("*.md"):
+                title = extract_title(md_file)
+                results.append({
+                    "path": str(md_file.relative_to(wiki_dir)),
+                    "title": title,
+                    "type": "entity",
+                })
+
+    # Check concepts
+    if scope in ("concept", "all"):
+        concepts_dir = wiki_dir / "concepts"
+        if concepts_dir.exists():
+            for md_file in concepts_dir.glob("*.md"):
+                title = extract_title(md_file)
+                results.append({
+                    "path": str(md_file.relative_to(wiki_dir)),
+                    "title": title,
+                    "type": "concept",
+                })
+
+    # Sort by title
+    results.sort(key=lambda x: x["title"].lower())
+    return results
+
+
+def extract_title(page_path: Path) -> str:
+    """Extract title from a markdown page.
+
+    Priority:
+    1. YAML frontmatter 'title' field
+    2. First H1 heading
+    3. Filename (without extension)
+
+    Args:
+        page_path: Path to the markdown file.
+
+    Returns:
+        Extracted title string.
+    """
+    import re
+
+    try:
+        content = page_path.read_text(encoding="utf-8")
+        lines = content.splitlines()
+
+        # Check for YAML frontmatter
+        if lines and lines[0].strip() == "---":
+            # Find closing ---
+            for i, line in enumerate(lines[1:], 1):
+                if line.strip() == "---":
+                    frontmatter = "\n".join(lines[1:i])
+                    # Look for title field
+                    match = re.search(r"^title:\s*(.+)$", frontmatter, re.MULTILINE)
+                    if match:
+                        return match.group(1).strip().strip('"\'')
+                    break
+
+        # Check for H1 heading
+        for line in lines:
+            if line.startswith("# "):
+                return line[2:].strip()
+
+        # Fall back to filename
+        return page_path.stem
+
+    except Exception:
+        return page_path.stem

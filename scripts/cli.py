@@ -294,5 +294,86 @@ def compile(
         console.print(f"[red]  Errors: {errors}[/red]")
 
 
+@app.command()
+def search(
+    query: str = typer.Argument(..., help="Search query string"),
+    context: int = typer.Option(3, "--context", "-c", help="Number of context lines to show"),
+    format: str = typer.Option("text", "--format", "-f", help="Output format: text, json, table"),
+    scope: str = typer.Option("all", "--scope", "-s", help="Search scope: entity, concept, all"),
+    limit: int = typer.Option(20, "--limit", "-l", help="Maximum number of results"),
+) -> None:
+    """Search the wiki knowledge base for matching pages.
+
+    Uses FTS5 full-text search with BM25 ranking to find relevant wiki pages.
+    Results include file path, title, and matching context.
+
+    Examples:
+        pm-skill search authentication
+        pm-skill search "password hashing" --scope entity
+        pm-skill search security --format json
+    """
+    from .search import format_search_results, search_wiki
+
+    cfg = load_config()
+    db_path = cfg.wiki_dir.parent / "index.db"
+
+    if not db_path.exists():
+        console.print("[yellow]No search index found. Run 'compile' first.[/yellow]")
+        raise typer.Exit(1)
+
+    try:
+        results = search_wiki(db_path, query, scope=scope, limit=limit)
+
+        if not results:
+            console.print(f"[yellow]No results found for:[/yellow] {query}")
+            return
+
+        formatted = format_search_results(results, context_lines=context, format_type=format)
+        console.print(formatted)
+
+    except Exception as e:
+        console.print(f"[red]Search error:[/red] {e}")
+        raise typer.Exit(1)
+
+
+@app.command("list")
+def list_pages(
+    scope: str = typer.Option("all", "--scope", "-s", help="List scope: entity, concept, all"),
+    format: str = typer.Option("text", "--format", "-f", help="Output format: text, json, table"),
+) -> None:
+    """List all wiki pages in the knowledge base.
+
+    Shows all entity and concept pages with their titles.
+    Titles are extracted from frontmatter or first heading.
+
+    Examples:
+        pm-skill list
+        pm-skill list --scope entity
+        pm-skill list --format json
+    """
+    from .search import format_search_results, list_wiki_pages
+
+    cfg = load_config()
+    wiki_dir = cfg.wiki_dir
+
+    if not wiki_dir.exists():
+        console.print("[yellow]Wiki directory not found. Run 'compile' first.[/yellow]")
+        raise typer.Exit(1)
+
+    try:
+        results = list_wiki_pages(wiki_dir, scope=scope)
+
+        if not results:
+            console.print(f"[yellow]No pages found in scope:[/yellow] {scope}")
+            return
+
+        formatted = format_search_results(results, context_lines=0, format_type=format)
+        console.print(formatted)
+
+    except Exception as e:
+        console.print(f"[red]List error:[/red] {e}")
+        raise typer.Exit(1)
+
+
 if __name__ == "__main__":
     app()
