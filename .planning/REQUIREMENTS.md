@@ -24,21 +24,21 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Knowledge Compilation
 
-- [ ] **CMP-01**: 支持将 raw/ 目录的文件编译为 wiki/ 知识库
-- [ ] **CMP-02**: 为每个 raw 文件生成对应的 entity 页面（wiki/entities/）
-- [ ] **CMP-03**: 自动提取概念并创建 concept 页面（wiki/concepts/）
-- [ ] **CMP-04**: 维护 wiki/index.md 总索引
-- [ ] **CMP-05**: 维护 wiki/glossary.md 术语表
-- [ ] **CMP-06**: 在 log/ 目录记录编译变更日志
-- [ ] **CMP-07**: 使用配置的大模型 API 进行编译
-- [ ] **CMP-08**: 编译结果包含置信度标注（EXTRACTED/INFERRED/AMBIGUOUS/UNVERIFIED）
+- [x] **CMP-01**: 支持将 raw/ 目录的文件编译为 wiki/ 知识库
+- [x] **CMP-02**: 为每个 raw 文件生成对应的 entity 页面（wiki/entities/）
+- [x] **CMP-03**: 自动提取概念并创建 concept 页面（wiki/concepts/）
+- [x] **CMP-04**: 维护 wiki/index.md 总索引
+- [x] **CMP-05**: 维护 wiki/glossary.md 术语表
+- [x] **CMP-06**: 在 log/ 目录记录编译变更日志
+- [x] **CMP-07**: 使用配置的大模型 API 进行编译
+- [x] **CMP-08**: 编译结果包含置信度标注（EXTRACTED/INFERRED/AMBIGUOUS/UNVERIFIED）
 
 ### Knowledge Retrieval
 
 - [ ] **RET-01**: 支持 CLI 关键词搜索（rg 命令封装）
 - [ ] **RET-02**: 支持列出所有 Markdown 文件（find 命令封装）
 - [ ] **RET-03**: 支持带上下文的搜索（显示3行上下文）
-- [ ] **RET-04**: SQLite FTS5 全文索引用于快速检索
+- [x] **RET-04**: SQLite FTS5 全文索引用于快速检索
 
 ### PRD Writing
 
@@ -102,18 +102,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IMP-04 | Phase 1: Foundation & Document Pipeline | Complete |
 | IMP-05 | Phase 1: Foundation & Document Pipeline | Complete |
 | IMP-06 | Phase 1: Foundation & Document Pipeline | Complete |
-| CMP-01 | Phase 2: Knowledge Compilation & Retrieval | Pending |
-| CMP-02 | Phase 2: Knowledge Compilation & Retrieval | Pending |
-| CMP-03 | Phase 2: Knowledge Compilation & Retrieval | Pending |
-| CMP-04 | Phase 2: Knowledge Compilation & Retrieval | Pending |
-| CMP-05 | Phase 2: Knowledge Compilation & Retrieval | Pending |
-| CMP-06 | Phase 2: Knowledge Compilation & Retrieval | Pending |
-| CMP-07 | Phase 2: Knowledge Compilation & Retrieval | Pending |
-| CMP-08 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| CMP-01 | Phase 2: Knowledge Compilation & Retrieval | Complete |
+| CMP-02 | Phase 2: Knowledge Compilation & Retrieval | Complete |
+| CMP-03 | Phase 2: Knowledge Compilation & Retrieval | Complete |
+| CMP-04 | Phase 2: Knowledge Compilation & Retrieval | Complete |
+| CMP-05 | Phase 2: Knowledge Compilation & Retrieval | Complete |
+| CMP-06 | Phase 2: Knowledge Compilation & Retrieval | Complete |
+| CMP-07 | Phase 2: Knowledge Compilation & Retrieval | Complete |
+| CMP-08 | Phase 2: Knowledge Compilation & Retrieval | Complete |
 | RET-01 | Phase 2: Knowledge Compilation & Retrieval | Pending |
 | RET-02 | Phase 2: Knowledge Compilation & Retrieval | Pending |
 | RET-03 | Phase 2: Knowledge Compilation & Retrieval | Pending |
-| RET-04 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| RET-04 | Phase 2: Knowledge Compilation & Retrieval | Complete |
 | PRD-01 | Phase 3: PRD Generation | Pending |
 | PRD-02 | Phase 3: PRD Generation | Pending |
 | PRD-03 | Phase 3: PRD Generation | Pending |

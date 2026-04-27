@@ -51,8 +51,8 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 02-01-PLAN.md — Wave 0: Test infrastructure (conftest fixtures, test scaffolds)
-- [ ] 02-02-PLAN.md — Wave 1: Compile command (LLM integration, FTS5 index, entity/concept pages) [CMP-01-08, RET-04]
+- [x] 02-01-PLAN.md — Wave 0: Test infrastructure (conftest fixtures, test scaffolds)
+- [x] 02-02-PLAN.md — Wave 1: Compile command (LLM integration, FTS5 index, entity/concept pages) [CMP-01-08, RET-04]
 - [ ] 02-03-PLAN.md — Wave 2: Search and list commands (FTS5 wrappers, CLI interface) [RET-01-03]
 
 ### Phase 3: PRD Generation
@@ -86,8 +86,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Document Pipeline | 2/3 | In progress | 01-PLAN, 02-PLAN |
-| 2. Knowledge Compilation & Retrieval | 0/3 | Not started | - |
+| 1. Foundation & Document Pipeline | 3/3 | Complete | 01-PLAN, 02-PLAN, 03-PLAN |
+| 2. Knowledge Compilation & Retrieval | 2/3 | In progress | 02-01, 02-02 |
 | 3. PRD Generation | 0/0 | Not started | - |
 | 4. Competitive Analysis | 0/0 | Not started | - |
 
