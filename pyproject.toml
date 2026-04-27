@@ -41,3 +41,6 @@ exclude_lines = [
     "raise NotImplementedError",
     "if TYPE_CHECKING:",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["scripts"]
