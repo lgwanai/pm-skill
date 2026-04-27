@@ -72,6 +72,11 @@ def load_config() -> PMSkillConfig:
     if not config_data:
         return PMSkillConfig()
 
+    # Handle [paths] section (common in test configs)
+    paths_data = config_data.pop("paths", None)
+    if paths_data:
+        config_data.update(paths_data)
+
     # Handle nested llm config
     llm_data = config_data.pop("llm", None)
     llm_config = LLMConfig(**llm_data) if llm_data else LLMConfig()

@@ -1,12 +1,14 @@
-"""CLI entry point for PM Skill (FND-01)."""
+"""CLI entry point for PM Skill (FND-01, FND-02, FND-03, IMP-01 to IMP-06)."""
 
 from pathlib import Path
 
 import typer
 from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from .config import load_config
+from .importer import import_batch, import_document
 from .utils.init import init_knowledge_base
 
 app = typer.Typer(
@@ -62,6 +64,64 @@ def config(
         table.add_row("llm.api_key_env", cfg.llm.api_key_env)
 
         console.print(table)
+
+
+@app.command("import")
+def import_doc(
+    path: Path = typer.Argument(..., exists=True, help="Document path to import"),
+    format: str = typer.Option(None, "--format", "-f", help="Force format (pdf, docx, html)"),
+    no_validate: bool = typer.Option(False, "--no-validate", help="Skip validation checks"),
+    quiet: bool = typer.Option(False, "--quiet", "-q", help="Suppress non-essential output"),
+) -> None:
+    """Import a document into the knowledge base.
+
+    Converts PDF, DOCX, and HTML files to Markdown and stores in raw/ directory.
+    """
+    cfg = load_config()
+
+    # Ensure raw directory exists
+    cfg.raw_dir.mkdir(parents=True, exist_ok=True)
+
+    if not quiet:
+        console.print(f"[blue]Importing[/blue] {path.name}...")
+
+    try:
+        output = import_document(
+            source_path=path,
+            output_dir=cfg.raw_dir,
+            format=format,
+            no_validate=no_validate,
+        )
+
+        if not quiet:
+            console.print(f"[green]Created:[/green] {output}")
+
+            # Show validation summary if enabled
+            if not no_validate:
+                content = output.read_text(encoding="utf-8")
+                from .utils.validation import validate_markdown
+
+                issues = validate_markdown(content)
+                if issues:
+                    errors = [i for i in issues if i.level == "error"]
+                    warns = [i for i in issues if i.level == "warn"]
+                    infos = [i for i in issues if i.level == "info"]
+
+                    if errors:
+                        console.print(f"[red]Errors: {len(errors)}[/red]")
+                    if warns:
+                        console.print(f"[yellow]Warnings: {len(warns)}[/yellow]")
+                    if infos:
+                        console.print(f"[blue]Info: {len(infos)}[/blue]")
+                else:
+                    console.print("[green]Validation: OK[/green]")
+
+    except ValueError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(1)
+    except Exception as e:
+        console.print(f"[red]Import failed:[/red] {e}")
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":
