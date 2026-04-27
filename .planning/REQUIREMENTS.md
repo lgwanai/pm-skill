@@ -35,9 +35,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Knowledge Retrieval
 
-- [ ] **RET-01**: 支持 CLI 关键词搜索（rg 命令封装）
-- [ ] **RET-02**: 支持列出所有 Markdown 文件（find 命令封装）
-- [ ] **RET-03**: 支持带上下文的搜索（显示3行上下文）
+- [x] **RET-01**: 支持 CLI 关键词搜索（FTS5 全文搜索）
+- [x] **RET-02**: 支持列出所有 Markdown 文件（entity/concept 页面列表）
+- [x] **RET-03**: 支持带上下文的搜索（显示上下文行）
 - [x] **RET-04**: SQLite FTS5 全文索引用于快速检索
 
 ### PRD Writing
@@ -110,9 +110,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CMP-06 | Phase 2: Knowledge Compilation & Retrieval | Complete |
 | CMP-07 | Phase 2: Knowledge Compilation & Retrieval | Complete |
 | CMP-08 | Phase 2: Knowledge Compilation & Retrieval | Complete |
-| RET-01 | Phase 2: Knowledge Compilation & Retrieval | Pending |
-| RET-02 | Phase 2: Knowledge Compilation & Retrieval | Pending |
-| RET-03 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| RET-01 | Phase 2: Knowledge Compilation & Retrieval | Complete |
+| RET-02 | Phase 2: Knowledge Compilation & Retrieval | Complete |
+| RET-03 | Phase 2: Knowledge Compilation & Retrieval | Complete |
 | RET-04 | Phase 2: Knowledge Compilation & Retrieval | Complete |
 | PRD-01 | Phase 3: PRD Generation | Pending |
 | PRD-02 | Phase 3: PRD Generation | Pending |
@@ -134,4 +134,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-27*
-*Last updated: 2026-04-27 after roadmap creation*
+*Last updated: 2026-04-27 - Phase 2 complete (RET-01, RET-02, RET-03)*

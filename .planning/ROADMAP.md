@@ -13,7 +13,7 @@ PM Skill transforms raw PM documents into structured wiki knowledge and leverage
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Document Pipeline** - Core Skill infrastructure and document-to-Markdown conversion
-- [ ] **Phase 2: Knowledge Compilation & Retrieval** - LLM-powered wiki compilation and FTS5 search
+- [x] **Phase 2: Knowledge Compilation & Retrieval** - LLM-powered wiki compilation and FTS5 search
 - [ ] **Phase 3: PRD Generation** - Multi-round PRD writing with knowledge enhancement
 - [ ] **Phase 4: Competitive Analysis** - Knowledge-based competitor analysis
 
@@ -53,7 +53,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Wave 0: Test infrastructure (conftest fixtures, test scaffolds)
 - [x] 02-02-PLAN.md — Wave 1: Compile command (LLM integration, FTS5 index, entity/concept pages) [CMP-01-08, RET-04]
-- [ ] 02-03-PLAN.md — Wave 2: Search and list commands (FTS5 wrappers, CLI interface) [RET-01-03]
+- [x] 02-03-PLAN.md — Wave 2: Search and list commands (FTS5 wrappers, CLI interface) [RET-01-03]
 
 ### Phase 3: PRD Generation
 **Goal**: Users can generate industry-standard PRDs through multi-round requirement collection, enhanced by knowledge base retrieval.
@@ -87,11 +87,11 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Document Pipeline | 3/3 | Complete | 01-PLAN, 02-PLAN, 03-PLAN |
-| 2. Knowledge Compilation & Retrieval | 2/3 | In progress | 02-01, 02-02 |
+| 2. Knowledge Compilation & Retrieval | 3/3 | Complete | 02-01, 02-02, 02-03 |
 | 3. PRD Generation | 0/0 | Not started | - |
 | 4. Competitive Analysis | 0/0 | Not started | - |
 
 ---
 *Roadmap created: 2026-04-27*
 *Based on research: .planning/research/SUMMARY.md*
-*Last updated: 2026-04-27 - Phase 2 plans created*
+*Last updated: 2026-04-27 - Phase 2 complete*
