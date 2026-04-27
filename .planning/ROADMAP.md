@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-PLAN.md — Wave 0: Test infrastructure (pytest setup, fixtures, test scaffolds)
-- [ ] 02-PLAN.md — Wave 1: Skill foundation (SKILL.md, CLI, config, init command) [FND-01, FND-02, FND-03]
+- [x] 02-PLAN.md — Wave 1: Skill foundation (SKILL.md, CLI, config, init command) [FND-01, FND-02, FND-03]
 - [ ] 03-PLAN.md — Wave 2: Document import pipeline (markitdown integration, validation) [IMP-01-06]
 
 ### Phase 2: Knowledge Compilation & Retrieval
@@ -81,7 +81,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Document Pipeline | 1/3 | In progress | 01-PLAN |
+| 1. Foundation & Document Pipeline | 2/3 | In progress | 01-PLAN, 02-PLAN |
 | 2. Knowledge Compilation & Retrieval | 0/0 | Not started | - |
 | 3. PRD Generation | 0/0 | Not started | - |
 | 4. Competitive Analysis | 0/0 | Not started | - |
@@ -89,4 +89,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 ---
 *Roadmap created: 2026-04-27*
 *Based on research: .planning/research/SUMMARY.md*
-*Last updated: 2026-04-27 - Plan 01-01 completed*
+*Last updated: 2026-04-27 - Plan 01-02 completed*

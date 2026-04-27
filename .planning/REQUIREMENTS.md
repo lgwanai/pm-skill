@@ -9,9 +9,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Foundation
 
-- [ ] **FND-01**: Skill 使用 create-skill 创建，遵循标准 Skill 架构（SKILL.md + scripts/ + references/）
-- [ ] **FND-02**: 配置文件支持设置文档存放位置（raw/wiki/log 目录路径）
-- [ ] **FND-03**: 目录结构自动初始化（raw/、wiki/、log/、index.db）
+- [x] **FND-01**: Skill 使用 create-skill 创建，遵循标准 Skill 架构（SKILL.md + scripts/ + references/）
+- [x] **FND-02**: 配置文件支持设置文档存放位置（raw/wiki/log 目录路径）
+- [x] **FND-03**: 目录结构自动初始化（raw/、wiki/、log/、index.db）
 
 ### Document Import
 
@@ -93,9 +93,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FND-01 | Phase 1: Foundation & Document Pipeline | Pending |
-| FND-02 | Phase 1: Foundation & Document Pipeline | Pending |
-| FND-03 | Phase 1: Foundation & Document Pipeline | Pending |
+| FND-01 | Phase 1: Foundation & Document Pipeline | Complete |
+| FND-02 | Phase 1: Foundation & Document Pipeline | Complete |
+| FND-03 | Phase 1: Foundation & Document Pipeline | Complete |
 | IMP-01 | Phase 1: Foundation & Document Pipeline | Pending |
 | IMP-02 | Phase 1: Foundation & Document Pipeline | Pending |
 | IMP-03 | Phase 1: Foundation & Document Pipeline | Pending |
