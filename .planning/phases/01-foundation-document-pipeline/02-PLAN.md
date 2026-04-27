@@ -50,6 +50,10 @@ must_haves:
       to: "~/.config/pm-skill/config.toml"
       via: "XDG Base Directory spec"
       pattern: "\.config/pm-skill"
+    - from: "pyproject.toml [project.scripts]"
+      to: "scripts.cli:app"
+      via: "entry point wiring"
+      pattern: "pm-skill = \"scripts.cli:app\""
 ---
 
 <objective>
@@ -287,7 +291,7 @@ Run tests: pytest tests/test_init.py -v
     - Test 5: CLI uses Rich for colored output
   </behavior>
   <action>
-Write tests first in tests/test_cli.py (new file):
+Write tests first in tests/test_cli.py (already created in Plan 01 Task 3, replace skip stubs):
 ```python
 from typer.testing import CliRunner
 from scripts.cli import app
@@ -319,11 +323,14 @@ Create scripts/cli.py:
 - Use Rich Console for colored output
 - Entry point: if __name__ == "__main__": app()
 
-Add entry point to pyproject.toml:
+CRITICAL - CLI entry point wiring:
+The entry point was already defined in pyproject.toml (Plan 01 Task 1) as:
 ```toml
 [project.scripts]
 pm-skill = "scripts.cli:app"
 ```
+
+This wiring creates the `pm-skill` command that calls `app` from `scripts.cli`. Verify the entry point is functional by running `pm-skill --help` after this task completes. The app object in scripts/cli.py MUST be a Typer instance (or callable) for the entry point to work.
 
 Run tests: pytest tests/test_cli.py -v
   </action>

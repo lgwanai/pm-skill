@@ -37,6 +37,9 @@ must_haves:
     - path: "tests/test_init.py"
       provides: "Directory initialization tests"
       exports: ["test_"]
+    - path: "tests/test_cli.py"
+      provides: "CLI entry point tests"
+      exports: ["test_"]
     - path: "tests/test_import_pdf.py"
       provides: "PDF import tests"
       exports: ["test_"]
@@ -131,12 +134,17 @@ name = "pm-skill"
 version = "0.1.0"
 requires-python = ">=3.12"
 
+[project.scripts]
+pm-skill = "scripts.cli:app"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short --cov=scripts --cov-report=term-missing"
 ```
+
+Note: Include [project.scripts] entry point definition now (pm-skill = "scripts.cli:app") so Plan 02 Task 4 can reference it. The entry point will become functional once scripts/cli.py with the Typer app is created in Plan 02.
 
 Update requirements.txt to include dev dependencies:
 - pytest>=8.0
@@ -179,7 +187,7 @@ For sample files, create minimal valid documents:
 
 <task type="auto">
   <name>Task 3: Create test file stubs</name>
-  <files>tests/test_skill.py, tests/test_config.py, tests/test_init.py, tests/test_import_pdf.py, tests/test_import_docx.py, tests/test_import_html.py, tests/test_markitdown.py, tests/test_storage.py, tests/test_validation.py</files>
+  <files>tests/test_skill.py, tests/test_config.py, tests/test_init.py, tests/test_cli.py, tests/test_import_pdf.py, tests/test_import_docx.py, tests/test_import_html.py, tests/test_markitdown.py, tests/test_storage.py, tests/test_validation.py</files>
   <action>
 Create test file stubs for each requirement. Each file should have:
 
@@ -199,30 +207,37 @@ Create test file stubs for each requirement. Each file should have:
    - test_init_creates_index_db(): Test SQLite index creation
    - test_init_idempotent(): Running init twice should not error
 
-4. tests/test_import_pdf.py - Tests for PDF import (IMP-01)
+4. tests/test_cli.py - Tests for CLI entry point (required by Plan 02 Task 4)
+   - test_cli_help(): Test --help shows available commands
+   - test_cli_init(): Test init command creates directories
+   - test_cli_config_show(): Test config command shows settings
+   - test_cli_import_pdf(): Test import command works for PDF
+   - test_cli_import_quiet(): Test --quiet flag suppresses output
+
+5. tests/test_import_pdf.py - Tests for PDF import (IMP-01)
    - test_import_pdf_creates_markdown(): Test PDF->MD conversion
    - test_import_pdf_content_preserved(): Test content extracted
    - test_import_pdf_encoding(): Test UTF-8 handling
 
-5. tests/test_import_docx.py - Tests for DOCX import (IMP-02)
+6. tests/test_import_docx.py - Tests for DOCX import (IMP-02)
    - test_import_docx_creates_markdown(): Test DOCX->MD conversion
    - test_import_docx_tables(): Test table preservation
 
-6. tests/test_import_html.py - Tests for HTML import (IMP-03)
+7. tests/test_import_html.py - Tests for HTML import (IMP-03)
    - test_import_html_creates_markdown(): Test HTML->MD conversion
    - test_import_html_links(): Test link preservation
 
-7. tests/test_markitdown.py - Tests for markitdown usage (IMP-04)
+8. tests/test_markitdown.py - Tests for markitdown usage (IMP-04)
    - test_markitdown_imports(): Test markitdown module available
    - test_markitdown_convert_pdf(): Test PDF conversion API
    - test_markitdown_convert_docx(): Test DOCX conversion API
 
-8. tests/test_storage.py - Tests for raw/ storage (IMP-05)
+9. tests/test_storage.py - Tests for raw/ storage (IMP-05)
    - test_markdown_saved_to_raw(): Test output path
    - test_markdown_filename_conversion(): Test filename handling
    - test_markdown_encoding(): Test UTF-8 write
 
-9. tests/test_validation.py - Tests for validation (IMP-06)
+10. tests/test_validation.py - Tests for validation (IMP-06)
    - test_validate_table_syntax(): Test table column alignment
    - test_validate_image_references(): Test image path checking
    - test_validate_format_integrity(): Test formatting checks
@@ -232,7 +247,7 @@ Each test should start with `pytest.skip("Wave 0 scaffold")` to mark as pending.
   <verify>
     <automated>pytest tests/ --collect-only | grep "test_" | wc -l</automated>
   </verify>
-  <done>All 9 test files exist with at least 3 tests each (27+ tests collected)</done>
+  <done>All 10 test files exist with at least 3 tests each (30+ tests collected)</done>
 </task>
 
 </tasks>
@@ -248,7 +263,7 @@ Test infrastructure checklist:
 - [ ] pytest installed and configured
 - [ ] conftest.py with shared fixtures
 - [ ] Sample documents in tests/fixtures/
-- [ ] All 9 test files exist
+- [ ] All 10 test files exist
 - [ ] Each test file has 3+ test functions
 - [ ] All tests are marked skip (Wave 0 scaffold)
 </verification>
