@@ -93,45 +93,45 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FND-01 | Phase 1 | Pending |
-| FND-02 | Phase 1 | Pending |
-| FND-03 | Phase 1 | Pending |
-| IMP-01 | Phase 1 | Pending |
-| IMP-02 | Phase 1 | Pending |
-| IMP-03 | Phase 1 | Pending |
-| IMP-04 | Phase 1 | Pending |
-| IMP-05 | Phase 1 | Pending |
-| IMP-06 | Phase 1 | Pending |
-| CMP-01 | Phase 2 | Pending |
-| CMP-02 | Phase 2 | Pending |
-| CMP-03 | Phase 2 | Pending |
-| CMP-04 | Phase 2 | Pending |
-| CMP-05 | Phase 2 | Pending |
-| CMP-06 | Phase 2 | Pending |
-| CMP-07 | Phase 2 | Pending |
-| CMP-08 | Phase 2 | Pending |
-| RET-01 | Phase 2 | Pending |
-| RET-02 | Phase 2 | Pending |
-| RET-03 | Phase 2 | Pending |
-| RET-04 | Phase 2 | Pending |
-| PRD-01 | Phase 3 | Pending |
-| PRD-02 | Phase 3 | Pending |
-| PRD-03 | Phase 3 | Pending |
-| PRD-04 | Phase 3 | Pending |
-| PRD-05 | Phase 3 | Pending |
-| PRD-06 | Phase 3 | Pending |
-| PRD-07 | Phase 3 | Pending |
-| PRD-08 | Phase 3 | Pending |
-| PRD-09 | Phase 3 | Pending |
-| PRD-10 | Phase 3 | Pending |
-| PRD-11 | Phase 3 | Pending |
-| ANA-01 | Phase 4 | Pending |
+| FND-01 | Phase 1: Foundation & Document Pipeline | Pending |
+| FND-02 | Phase 1: Foundation & Document Pipeline | Pending |
+| FND-03 | Phase 1: Foundation & Document Pipeline | Pending |
+| IMP-01 | Phase 1: Foundation & Document Pipeline | Pending |
+| IMP-02 | Phase 1: Foundation & Document Pipeline | Pending |
+| IMP-03 | Phase 1: Foundation & Document Pipeline | Pending |
+| IMP-04 | Phase 1: Foundation & Document Pipeline | Pending |
+| IMP-05 | Phase 1: Foundation & Document Pipeline | Pending |
+| IMP-06 | Phase 1: Foundation & Document Pipeline | Pending |
+| CMP-01 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| CMP-02 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| CMP-03 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| CMP-04 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| CMP-05 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| CMP-06 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| CMP-07 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| CMP-08 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| RET-01 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| RET-02 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| RET-03 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| RET-04 | Phase 2: Knowledge Compilation & Retrieval | Pending |
+| PRD-01 | Phase 3: PRD Generation | Pending |
+| PRD-02 | Phase 3: PRD Generation | Pending |
+| PRD-03 | Phase 3: PRD Generation | Pending |
+| PRD-04 | Phase 3: PRD Generation | Pending |
+| PRD-05 | Phase 3: PRD Generation | Pending |
+| PRD-06 | Phase 3: PRD Generation | Pending |
+| PRD-07 | Phase 3: PRD Generation | Pending |
+| PRD-08 | Phase 3: PRD Generation | Pending |
+| PRD-09 | Phase 3: PRD Generation | Pending |
+| PRD-10 | Phase 3: PRD Generation | Pending |
+| PRD-11 | Phase 3: PRD Generation | Pending |
+| ANA-01 | Phase 4: Competitive Analysis | Pending |
 
 **Coverage:**
 - v1 requirements: 33 total
 - Mapped to phases: 33
-- Unmapped: 0 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-27*
-*Last updated: 2026-04-27 after initial definition*
+*Last updated: 2026-04-27 after roadmap creation*
