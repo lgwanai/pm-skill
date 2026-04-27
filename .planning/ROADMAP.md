@@ -67,7 +67,14 @@ Plans:
   5. User can choose ToB template and get PRD focused on business logic/permissions/approvals
   6. User can choose backend template and get PRD focused on lists/permissions/audit logs
   7. User can choose mini-program template and get PRD focused on scenarios/platform rules/performance
-**Plans**: TBD
+**Plans**: 5 plans in 5 waves
+
+Plans:
+- [ ] 03-01-PLAN.md — Wave 0: Test infrastructure (test scaffolds, templates, prompts) [PRD-all]
+- [ ] 03-02-PLAN.md — Wave 1: Conversation & CLI (models, conversation.py, prd command) [PRD-01, PRD-02]
+- [ ] 03-03-PLAN.md — Wave 2: Retrieval (iterative loop, suggestions) [PRD-03, PRD-04]
+- [ ] 03-04-PLAN.md — Wave 3: Validation & Assessment (conflicts, risks) [PRD-05, PRD-06]
+- [ ] 03-05-PLAN.md — Wave 4: Templates & Generation (rendering, output, checkpoint) [PRD-07-11]
 
 ### Phase 4: Competitive Analysis
 **Goal**: Users can generate competitive analysis reports based on competitor documents in the knowledge base.
@@ -88,10 +95,10 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation & Document Pipeline | 3/3 | Complete | 01-PLAN, 02-PLAN, 03-PLAN |
 | 2. Knowledge Compilation & Retrieval | 3/3 | Complete | 02-01, 02-02, 02-03 |
-| 3. PRD Generation | 0/0 | Not started | - |
+| 3. PRD Generation | 0/5 | Not started | - |
 | 4. Competitive Analysis | 0/0 | Not started | - |
 
 ---
 *Roadmap created: 2026-04-27*
 *Based on research: .planning/research/SUMMARY.md*
-*Last updated: 2026-04-27 - Phase 2 complete*
+*Last updated: 2026-04-27 - Phase 3 plans created*
