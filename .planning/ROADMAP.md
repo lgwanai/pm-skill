@@ -30,7 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. User can import a DOC/DOCX file and find it converted to Markdown in raw/
   5. User can import an HTML file and find it converted to Markdown in raw/
   6. Converted files pass basic validation (table syntax, image references, format integrity)
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
+
+Plans:
+- [ ] 01-PLAN.md — Wave 0: Test infrastructure (pytest setup, fixtures, test scaffolds)
+- [ ] 02-PLAN.md — Wave 1: Skill foundation (SKILL.md, CLI, config, init command) [FND-01, FND-02, FND-03]
+- [ ] 03-PLAN.md — Wave 2: Document import pipeline (markitdown integration, validation) [IMP-01-06]
 
 ### Phase 2: Knowledge Compilation & Retrieval
 **Goal**: Raw documents are compiled into a structured wiki knowledge base with entities, concepts, and cross-links, searchable via CLI and FTS5.
@@ -76,7 +81,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Document Pipeline | 0/0 | Not started | - |
+| 1. Foundation & Document Pipeline | 0/3 | Planning complete | - |
 | 2. Knowledge Compilation & Retrieval | 0/0 | Not started | - |
 | 3. PRD Generation | 0/0 | Not started | - |
 | 4. Competitive Analysis | 0/0 | Not started | - |
@@ -84,3 +89,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 ---
 *Roadmap created: 2026-04-27*
 *Based on research: .planning/research/SUMMARY.md*
+*Last updated: 2026-04-27 - Phase 1 planning complete*
