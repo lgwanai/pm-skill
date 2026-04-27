@@ -15,12 +15,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Document Import
 
-- [ ] **IMP-01**: 支持导入 PDF 文档并转换为 Markdown
-- [ ] **IMP-02**: 支持导入 DOC/DOCX 文档并转换为 Markdown
-- [ ] **IMP-03**: 支持导入 HTML 文档并转换为 Markdown
-- [ ] **IMP-04**: 使用 markitdown 工具进行文档转换
-- [ ] **IMP-05**: 转换后的 Markdown 文件存入 raw/ 目录
-- [ ] **IMP-06**: 转换结果包含基本验证（表格语法、图片引用、格式完整性）
+- [x] **IMP-01**: 支持导入 PDF 文档并转换为 Markdown
+- [x] **IMP-02**: 支持导入 DOC/DOCX 文档并转换为 Markdown
+- [x] **IMP-03**: 支持导入 HTML 文档并转换为 Markdown
+- [x] **IMP-04**: 使用 markitdown 工具进行文档转换
+- [x] **IMP-05**: 转换后的 Markdown 文件存入 raw/ 目录
+- [x] **IMP-06**: 转换结果包含基本验证（表格语法、图片引用、格式完整性）
 
 ### Knowledge Compilation
 
@@ -96,12 +96,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FND-01 | Phase 1: Foundation & Document Pipeline | Complete |
 | FND-02 | Phase 1: Foundation & Document Pipeline | Complete |
 | FND-03 | Phase 1: Foundation & Document Pipeline | Complete |
-| IMP-01 | Phase 1: Foundation & Document Pipeline | Pending |
-| IMP-02 | Phase 1: Foundation & Document Pipeline | Pending |
-| IMP-03 | Phase 1: Foundation & Document Pipeline | Pending |
-| IMP-04 | Phase 1: Foundation & Document Pipeline | Pending |
-| IMP-05 | Phase 1: Foundation & Document Pipeline | Pending |
-| IMP-06 | Phase 1: Foundation & Document Pipeline | Pending |
+| IMP-01 | Phase 1: Foundation & Document Pipeline | Complete |
+| IMP-02 | Phase 1: Foundation & Document Pipeline | Complete |
+| IMP-03 | Phase 1: Foundation & Document Pipeline | Complete |
+| IMP-04 | Phase 1: Foundation & Document Pipeline | Complete |
+| IMP-05 | Phase 1: Foundation & Document Pipeline | Complete |
+| IMP-06 | Phase 1: Foundation & Document Pipeline | Complete |
 | CMP-01 | Phase 2: Knowledge Compilation & Retrieval | Pending |
 | CMP-02 | Phase 2: Knowledge Compilation & Retrieval | Pending |
 | CMP-03 | Phase 2: Knowledge Compilation & Retrieval | Pending |
