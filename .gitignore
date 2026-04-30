@@ -1,0 +1,17 @@
+# PM Skill packages
+dist/
+
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Config with secrets
+config.toml
+
+# Knowledge base (user-generated)
+wiki/entities/*
+wiki/concepts/*
+wiki/index.md
+wiki/glossary.md
+wiki/log.md
+.DS_Store

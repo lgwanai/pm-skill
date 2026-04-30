@@ -1,1 +1,0 @@
-"""PM Skill - Product Manager Knowledge Assistant."""
