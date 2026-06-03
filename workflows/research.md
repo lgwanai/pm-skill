@@ -33,19 +33,46 @@
 
 ### 步骤 1：信息收集
 
-**1.1 Wiki 搜索**（如有 llm-wiki-skill）：
-- 搜索已有知识库中的相关实体和概念
-- 识别知识空白 → 优先研究
+**1.1 检测研究引擎**：
 
-**1.2 Web 搜索**：
+```
+# 检测 deerflow-skill
+ls ~/.claude/skills/deerflow/ 2>/dev/null && echo "deerflow: ✅" || echo "deerflow: ❌ 未安装"
+
+# 检测 llm-wiki-skill
+ls .wiki/ 2>/dev/null && echo "wiki: ✅" || echo "wiki: ❌ 未安装"
+```
+
+根据可用引擎选择策略：
+- deerflow ✅ → 首选 deerflow --ultra 做深度调研
+- deerflow ❌ → 降级为 Agent 原生 WebSearch
+
+**1.2 Web 研究（deerflow-skill — 首选）**：
+
+根据研究深度选择 deerflow 模式：
+
+| 深度 | 命令 | 示例 |
+|------|------|------|
+| 快速查询 | `/deer --flash` | "/deer --flash Tesla 2025 Q4 revenue" |
+| 标准调研 | `/deer` | "/deer 调研 RAG 技术的最新进展" |
+| 结构化分析 | `/deer --pro` | "/deer --pro 对比分析 Notion 和 Confluence 的功能差异" |
+| 全面深度调研 | `/deer --ultra` | "/deer --ultra 深度调研 AI 代码审查工具的竞品格局：识别 Top 5 竞品，每家从功能、定价、GTM、用户评价四个维度分析" |
+
+`--ultra` 模式下，deerflow 自动将任务拆解为并行子代理：
+- 子代理 1：调研竞品 A
+- 子代理 2：调研竞品 B
+- 子代理 3：调研竞品 C
+- ...（并行执行，大幅缩短调研时间）
+
+**1.3 Web 搜索（Agent 原生 — 降级方案）**：
 - 使用 WebSearch 进行多轮搜索
 - 竞品搜索：`"{product} competitors"` `"{行业} 市场规模"`
 - 用户研究：`"{目标用户} 痛点"` `"{行业} 用户调研"`
-- 市场数据：`"{行业} market size 2025 2026"` `"{领域} trends"`
-
-**1.3 深度挖掘**（标准/深度研究）：
 - 使用 WebFetch 读取关键来源的完整内容
-- 提取数据、引用、方法论
+
+**1.4 Wiki 搜索**（如有 llm-wiki-skill）：
+- 搜索已有知识库中的相关实体和概念
+- 识别知识空白 → 优先用 deerflow 补充
 
 ### 步骤 2：分析综合
 

@@ -1,6 +1,6 @@
 ---
 name: pm-skill
-description: "产品经理全生命周期管理助手。覆盖从项目初始化、产品发现、策略制定、PRD 生成、执行规划到发布上线的完整工作流。命令：/pm-init, /pm-plan, /pm-execute, /pm-verify, /pm-transition, /pm-next, /pm-research, /pm-prd, /pm-strategy, /pm-release, /pm-quick, /pm-health, /pm-help, /pm-config, /pm-todo, /pm-wiki。集成 llm-wiki-skill 提供知识库编译检索能力。"
+description: "产品经理全生命周期管理助手。覆盖从项目初始化、产品发现、策略制定、PRD 生成、执行规划到发布上线的完整工作流。命令：/pm-init, /pm-plan, /pm-execute, /pm-verify, /pm-transition, /pm-next, /pm-research, /pm-prd, /pm-strategy, /pm-release, /pm-quick, /pm-health, /pm-help, /pm-config, /pm-todo, /pm-wiki。集成 deerflow-skill（Web 研究引擎）和 llm-wiki-skill（知识库引擎）提供专业级调研和知识管理能力。"
 ---
 
 # PM Skill — 产品经理全生命周期管理助手
@@ -138,6 +138,60 @@ pm-skill **不重新实现** wiki 功能，而是通过 `/pm-wiki` 桥接命令�
 
 ---
 
+## 与 deerflow-skill 集成
+
+pm-skill **不重新实现** Web 研究能力，而是通过 `/pm-research` 等命令驱动 deerflow-skill 执行深度调研。
+
+**三者协作模式**：
+
+| Skill | 角色 | 核心能力 |
+|-------|------|----------|
+| **pm-skill** | PM 工作流编排 | 生命周期管理、引导式提问、模板化输出、验证 |
+| **deerflow-skill** | 研究引擎 | Web 搜索、竞品调研、多步推理、并行子代理 |
+| **llm-wiki-skill** | 知识引擎 | 知识编译、混合检索（BM25+向量+图谱）、记忆固化 |
+
+```
+/pm-research "竞品分析"
+  │
+  ├── pm-skill: 引导定义研究范围、问题、深度
+  ├── deerflow-skill: /deer --ultra 并行搜索竞品 + 采集信息
+  ├── llm-wiki-skill: /wiki-query 搜索已有知识库
+  └── pm-skill: 综合 → RESEARCH.md → 结晶回 wiki
+```
+
+**检测逻辑**（在需要深度研究时执行）：
+1. 检查 `~/.claude/skills/deerflow/` 目录是否存在
+2. 检查 `python3 -c "import deerflow"` 是否成功
+3. 如未安装，提示用户：
+
+```
+此功能需要 deerflow-skill（专业级 Web 研究引擎）。安装方法：
+  git clone https://github.com/lgwanai/deerflow-skill ~/.claude/skills/deerflow
+  cd ~/.claude/skills/deerflow
+  cp config.example.yaml config.yaml
+  # 编辑 config.yaml 填入 API keys
+  pip install deerflow-harness langchain langchain-anthropic langchain-openai tavily-python httpx pyyaml
+
+安装后重启 Claude Code 即可。详见 https://github.com/lgwanai/deerflow-skill
+```
+
+**deerflow 模式选择**：
+
+| 模式 | 命令 | 适用场景 |
+|------|------|----------|
+| 快速 | `/deer --flash` | 快速事实查询（如"Crunchbase 上 X 公司的融资额"） |
+| 标准 | `/deer` | 常规调研（如"搜索 X 领域的最新趋势"） |
+| 专业 | `/deer --pro` | 结构化分析、竞品对比 |
+| 超级 | `/deer --ultra` | 全面深度调研、多维度并行竞品分析 |
+
+**集成触点**：
+- `/pm-research` → 首选 deerflow --ultra 执行 Web 调研，综合后生成 RESEARCH.md
+- `/pm-prd`（研究阶段）→ deerflow --pro 补充行业最佳实践
+- `/pm-strategy` → deerflow --pro 搜索竞品策略和定位
+- 详见 `references/deerflow-integration.md`
+
+---
+
 ## 配置
 
 项目配置存储在 `.planning/config.json`。关键设置：
@@ -147,6 +201,7 @@ pm-skill **不重新实现** wiki 功能，而是通过 `/pm-wiki` 桥接命令�
 | `mode` | `interactive`, `yolo` | `interactive` | 每步确认 vs. 自动批准 |
 | `granularity` | `coarse`, `standard`, `fine` | `standard` | 阶段粒度（3-5 / 5-8 / 8-12 阶段） |
 | `workflow.research` | boolean | `true` | 规划前进行领域研究 |
+| `workflow.deerflow_enabled` | boolean | `true` | 启用 deerflow-skill 作为 Web 研究引擎 |
 | `workflow.wiki_enabled` | boolean | `true` | 启用 llm-wiki-skill 集成 |
 | `workflow.prd_gates` | boolean | `true` | PRD 生成启用 BLOCKING gates |
 | `gates.confirm_roadmap` | boolean | `true` | 路线图确认 gate |

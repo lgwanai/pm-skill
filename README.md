@@ -673,13 +673,14 @@ pm-skill/
 │   ├── TODO.md                    # TODO 面板
 │   └── config.json                # PM 工作流配置
 │
-└── references/                    # 10 个领域知识 & 模式参考
+└── references/                    # 11 个领域知识 & 模式参考
     ├── questioning.md             # 产品发现提问策略
     ├── verification-patterns.md   # 验证模式（占位符/grep/交叉引用检测）
     ├── prd-research.md            # PRD 研究方法论（4 轮对话流程）
     ├── collect.md                 # PRD 模板类型自动检测规则
     ├── pm-frameworks.md           # PM 框架图谱（发现/策略/执行/GTM）
     ├── wiki-integration.md        # llm-wiki-skill 桥接指南
+    ├── deerflow-integration.md    # deerflow-skill 桥接指南
     └── domain/                    # PM 领域能力参考
         ├── discovery-methods.md   # 产品发现技术
         ├── strategy-frameworks.md # 策略框架
@@ -689,11 +690,53 @@ pm-skill/
 
 ---
 
+## 外部 Skill 集成
+
+pm-skill 驱动两个专业 skill 协同工作，自己不重新实现它们的功能：
+
+| Skill | 角色 | 核心能力 | 安装 |
+|-------|------|----------|------|
+| **deerflow-skill** | 🔍 研究引擎 | Web 搜索、竞品调研、多步推理、并行子代理 | [GitHub](https://github.com/lgwanai/deerflow-skill) |
+| **llm-wiki-skill** | 📚 知识引擎 | 知识编译、混合检索（BM25+向量+图谱）、记忆固化 | [GitHub](https://github.com/lgwanai/pm-skill) |
+
+**协作模式**：
+
+```
+/pm-research "竞品分析"
+  ├── pm-skill: 引导定义研究范围、问题、深度
+  ├── deerflow-skill: /deer --ultra 并行搜索竞品 + 采集信息
+  ├── llm-wiki-skill: /wiki-query 搜索已有知识库
+  └── pm-skill: 综合 → RESEARCH.md → 结晶回 wiki
+```
+
+> 两个外部 skill 均为**可选增强**。如未安装，pm-skill 会降级使用 Agent 原生能力（WebSearch、文件搜索等）。
+
+### 安装 deerflow-skill
+
+```bash
+git clone https://github.com/lgwanai/deerflow-skill ~/.claude/skills/deerflow
+cd ~/.claude/skills/deerflow
+cp config.example.yaml config.yaml
+# 编辑 config.yaml 填入 API keys（DEEPSEEK_API_KEY + TAVILY_API_KEY）
+pip install deerflow-harness langchain langchain-anthropic langchain-openai tavily-python httpx pyyaml
+```
+
+### 安装 llm-wiki-skill
+
+```bash
+git clone https://github.com/lgwanai/pm-skill ~/.claude/skills/llm-wiki-skill
+cd ~/.claude/skills/llm-wiki-skill && pip install -e .
+```
+
+---
+
 ## 依赖
 
 零外部 Python 依赖。仅使用 Agent 原生能力：Read、Write、Grep、AskUserQuestion。
 
-**可选增强**：安装 [llm-wiki-skill](https://github.com/lgwanai/pm-skill) 获得知识库编译和混合检索能力（BM25 + 向量 + 知识图谱）。
+**可选增强**：
+- [deerflow-skill](https://github.com/lgwanai/deerflow-skill) — Web 研究引擎（搜索、调研、并行代理）
+- [llm-wiki-skill](https://github.com/lgwanai/pm-skill) — 知识库引擎（编译、混合检索、记忆固化）
 
 ---
 
@@ -722,5 +765,6 @@ pm-skill/
 
 - [spec-skill](https://github.com/anthropics/claude-code) — Ask→Plan→Execute 生命周期管理模式
 - [pm-skills](https://github.com/lgwanai/pm-skills) — 65 项 PM 技能的领域框架参考
+- [deerflow-skill](https://github.com/lgwanai/deerflow-skill) — Web 研究引擎
 - [llm-wiki-skill](https://github.com/lgwanai/pm-skill) — 知识库引擎
 - [LLM Wiki v2](https://gist.github.com/rohitg00/2067ab416f7bbe447c1977edaaa681e2) — 知识生命周期方法论

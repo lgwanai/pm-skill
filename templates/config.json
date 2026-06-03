@@ -21,6 +21,9 @@
     "research": true,
     "_research_comment": "规划前进行市场和领域研究",
 
+    "deerflow_enabled": true,
+    "_deerflow_enabled_comment": "启用 deerflow-skill 作为 Web 研究引擎。如未安装，降级到 Agent 原生 WebSearch。",
+
     "wiki_enabled": true,
     "_wiki_enabled_comment": "启用 llm-wiki-skill 集成。如未安装，自动降级。",
 
