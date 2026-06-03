@@ -8,10 +8,18 @@ __pycache__/
 # Config with secrets
 config.toml
 
-# Knowledge base (user-generated)
+# Knowledge base (user-generated) - now managed by llm-wiki-skill
 wiki/entities/*
 wiki/concepts/*
 wiki/index.md
 wiki/glossary.md
 wiki/log.md
+.wiki/
+
+# IDE
 .DS_Store
+.idea/
+.vscode/
+
+# Planning artifacts (user projects)
+.planning/

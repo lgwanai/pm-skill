@@ -1,373 +1,219 @@
 ---
 name: pm-skill
-description: Product Manager Knowledge Assistant. Import PM documents (PDF/DOCX/HTML), compile to structured wiki, generate professional PRD. Use when user wants to manage product documentation, compile knowledge base, or write PRD documents.
+description: "产品经理全生命周期管理助手。覆盖从项目初始化、产品发现、策略制定、PRD 生成、执行规划到发布上线的完整工作流。命令：/pm-init, /pm-plan, /pm-execute, /pm-verify, /pm-transition, /pm-next, /pm-research, /pm-prd, /pm-strategy, /pm-release, /pm-quick, /pm-health, /pm-help, /pm-config, /pm-todo, /pm-wiki。集成 llm-wiki-skill 提供知识库编译检索能力。"
 ---
 
-# PM Skill
+# PM Skill — 产品经理全生命周期管理助手
 
-Product Manager Knowledge Assistant for document management and PRD generation.
+产品经理的结构化工作系统，将模糊的产品想法转化为可执行的阶段计划，
+通过引导式提问、系统化研究、模板化输出和严格验证，覆盖从 0 到 1 的完整产品生命周期。
 
----
+**核心理念**: 引导式工作流（Ask → Plan → Execute → Verify → Transition）。
+每个阶段都有 BLOCKING gate——你必须停下来等待用户确认，不能一口气冲到底。
 
-## Command: /wiki
-
-Follows [LLM Wiki v2](https://gist.github.com/rohitg00/2067ab416f7bbe447c1977edaaa681e2)
-methodology, building on [karpathy's original](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f):
-the wiki is a persistent, compounding artifact with **knowledge lifecycle management** —
-confidence decays, claims supersede, and quality is continuously scored.
-
-Usage: `/wiki <path>`
-
-Tools allowed: Read, Write, Todowrite, Grep — NOT Python scripts, NOT external APIs.
-
-### Consolidation Tiers
-
-The wiki has three tiers of knowledge, each more compressed and higher-confidence:
-
-| Tier | Location | What | Confidence |
-|------|----------|------|------------|
-| Working | raw sources | Original documents, unprocessed | raw |
-| Episodic | `wiki/entities/` | Extracted facts from individual sources | source-count + recency |
-| Semantic | `wiki/concepts/` | Cross-source patterns and principles | reinforced by multiple sources |
-
-Knowledge promotes upward: a fact seen in 3+ sources at episodic level → eligible for semantic consolidation.
-
-### Process
-
-**Step 0 — Survey existing wiki** (always do this first)
-Use `LS` to list `wiki/entities/` and `wiki/entities/../concepts/`. Read `wiki/index.md`.
-This tells you what knowledge already exists so you can decide what to CREATE vs UPDATE.
+**CRITICAL RULE**: 在每个 BLOCKING gate 处 STOP and WAIT for user confirmation。
+不要在单轮对话中从规划跳到执行。
 
 ---
 
-**Step 1 — Read the new source**
-Read the full content of the input file.
+## 命令清单
 
-**Step 2 — Extract structured knowledge**
-Analyze the content and identify:
+所有命令以 `/pm-<name>` 形式调用（如 `/pm-init`、`/pm-plan 1`）。
+命令自动加载对应的 workflow 文档。
 
-- **Entities** — concrete, specific things. Products, features, systems, metrics, data
-  fields, roles, processes, events. Answer: "what/who exists here?"
-  Example: "支付网关", "用户留存率", "商户管理后台", "订单表"
+### 核心生命周期命令（6 个）
 
-- **Concepts** — abstract ideas, patterns, principles. Methodologies, strategies,
-  mental models, trade-offs, industry trends. Answer: "what ideas does this explore?"
-  Example: "AARRR增长模型", "事件驱动架构", "最小可用产品", "RBAC权限设计"
+| 命令 | 别名 | 功能 |
+|------|------|------|
+| `/pm-init [project-name]` | `/pm-new` | 初始化 PM 项目：引导提问→需求提取→路线图→创建 .planning/ 结构 |
+| `/pm-plan <N>` | `/pm-phase` | 规划阶段 N：加载上下文→阶段讨论→研究→PRD→任务分解→must_haves |
+| `/pm-execute <N>` | `/pm-exec` | 执行阶段 N 的所有计划：逐任务实施→验证→原子提交 |
+| `/pm-verify <N>` | `/pm-check` | 验证阶段 N 完成度：must_haves 检查、缺口分析 |
+| `/pm-transition` | `/pm-next-phase` | 完成当前阶段→更新上下文→准备下一阶段 |
+| `/pm-next` | — | 自动检测当前状态，建议/执行下一步 |
 
-- **Relations** — how entities and concepts connect. Use TYPED edges:
-  `depends_on`, `implements`, `triggers`, `is_part_of`, `uses`, `caused`, `fixed`,
-  `supersedes`, `contradicts`, `references`
+### PM 领域工具命令（5 个）
 
-**Confidence model v2** — scored, not just tagged:
-```
-Confidence = (source_count / (source_count + 2)) × recency_weight
-
-source_count: how many documents mention this entity/concept
-recency_weight: 1.0 (≤30 days) → 0.7 (30-90 days) → 0.4 (>90 days)
-```
-
-Each item gets:
-- **Score** (0.0-1.0): computed from source_count + recency
-- **Label**: HIGH (≥0.7) | MEDIUM (0.4-0.7) | LOW (<0.4)
-- **Sources**: {N} documents
-- **Last confirmed**: {date}
-- **Base annotation**: EXTRACTED | INFERRED | AMBIGUOUS
-
-**Step 3 — For each extracted entity/concept, decide: CREATE, UPDATE, or MERGE**
-
-```
-Does "wiki/entities/{name}.md" already exist?
-├── NO  → CREATE new file (use template below)
-└── YES → Read existing file. Compare with new info:
-    ├── New info confirms existing → UPDATE sources list, STRENGTHEN confidence
-    ├── New info adds detail → APPEND to description, ADD new source
-    └── New info contradicts → ADD [⚠ 矛盾] section with both claims:
-        - 旧说法 (来源: {old source}): "{old claim}"
-        - 新说法 (来源: {new source}): "{new claim}"
-        → Set confidence to AMBIGUOUS. Do NOT delete old content.
-```
-
-**Step 3a — CREATE: New entity page** (`wiki/entities/{name}.md`)
-```markdown
-# {entity name}
-
-**类型**: 实体
-**置信度**: {score} ({label}) — {source_count} sources, last confirmed {date}
-**基础标注**: {EXTRACTED | INFERRED | AMBIGUOUS}
-**来源**: {source filename}
-
-## 描述
-{what it is, why it matters — preserve original data/tables/numbers}
-
-## 关联
-- → [{related}](../entities/{related}.md) `{relation_type}`: {description}
-- → [{concept}](../concepts/{concept}.md) `embodies`: {how this entity embodies the concept}
-```
-
-**Step 3b — UPDATE: Existing entity page** — Read it first, then append:
-```markdown
-# {entity name}
-
-**类型**: 实体
-**置信度**: {new_score} ({new_label}) — {new_count} sources, last confirmed {date}
-  (was: {old_score} from {old_count} sources)
-
-**基础标注**: {highest base annotation}
-**来源**: {old sources}, {new source}
-
-## 描述
-{merged description — new info appended after existing}
-
-## 新增信息 (来自 {new source})
-{new information from the latest document}
-
-## {if contradiction found →}
-## ⚠ 矛盾链
-- ⬅ [SUPERSEDED] 旧说法 ({old_source}, {old_date}): "{old claim}"
-- ➡ [CURRENT] 新说法 ({new_source}, {date}): "{new claim}"
-
-## 关联
-{updated — add new typed relations}
-```
-
-**Step 3c — Same for concepts**: CREATE or UPDATE `wiki/concepts/{name}.md` using
-the same merge logic. When a concept already exists and new source adds to it:
-- Append new source to the **来源** list
-- Add new concrete examples from this source to **说明**
-- Add newly discovered related entities to **关联实体**
-
-**Step 4 — Update existing pages that are related to new entities/concepts**
-For example, if new file mentions "支付网关" and `wiki/entities/t_transaction.md`
-already exists with an association to payment, update t_transaction.md's 关联 section
-to add the new cross-reference.
-
-This is the key LLM Wiki insight: **a single source might touch 10-15 wiki pages.**
-
----
-
-**Step 5 — Update wiki/index.md**
-Add NEW entries, do NOT rewrite existing entries. Keep all pages with one-line
-summaries sorted by type.
-
-**Step 6 — Update wiki/glossary.md**
-Add NEW terms. Update existing definitions only if the new source provides a
-more precise or authoritative definition. Keep alphabetical order.
-
-**Step 7 — Append to wiki/log.md**
-```markdown
-## [YYYY-MM-DD HH:MM] ingest | {filename}
-- 新建: {N} 实体 ({list}), {M} 概念 ({list})
-- 更新: {X} 实体 ({list}), {Y} 概念 ({list})
-- 矛盾: {Z} 处 ({details})
-- Quality: {score}/1.0
-```
-
-**Step 8 — Self-Assess Quality**
-Score your own work on 4 dimensions (each 0.0-1.0):
-1. **Entity precision**: Did I correctly distinguish entities from concepts?
-2. **Relation coverage**: Did I find the key cross-references?
-3. **Data preservation**: Did I preserve original tables/numbers/quotes?
-4. **Contradiction handling**: Did I flag all conflicts?
-
-Report: `Quality: {avg}/1.0 ({breakdown})`
-
-If score < 0.6, re-read the source and fix the weakest dimension.
-
----
-
-### Critical Rules
-- **Step 0 is mandatory.** Never ingest without first knowing what already exists.
-- Each Write call = ONE file.
-- **NEVER delete** old entity/concept content when ingesting new sources.
-  Always APPEND, MERGE, or flag contradictions.
-- Contradiction = valuable signal. Flag it, don't hide it.
-- Entities preserve original data (tables, numbers, quotes). Not one-liners.
-- Concepts synthesize ideas across entities. Not repeating entity content.
-- Entity ≠ Concept. If you can point to a specific thing → entity. If it's an abstract idea → concept.
-- Chinese output.
-
----
-
-## Command: /prd
-
-Follows spec-skill's **Ask-Plan-Execute** workflow with BLOCKING gates.
-You are a product expert, not an order-taker. Challenge fuzzy requirements.
-Surface hidden assumptions. Every round deepens understanding.
-
-Usage:
-- `/prd <description>` — start new PRD
-- `/prd revise <project-name> <change>` — revise existing PRD (creates new version)
-
-Reference: `references/prompts/prd-research.md` for detailed research methodology.
-
----
-
-### Phase 1: Research & Discovery (BLOCKING — multi-round)
-
-**Round 1 — Open Discovery**
-Read the user's requirement. Ask 2-4 focused questions (use `question` tool):
-- What problem does this solve? Who has this problem today?
-- What does "done" look like? How to measure success?
-- Who are the users? Core workflows?
-- What constraints exist? (time, platform, compliance)
-
-**Rule**: ≤ 4 questions per round. Follow the thread, not a script.
-
-**Round 2 — Knowledge Base Search**
-Search `wiki/` exhaustively using multiple angles and tools:
-
-**Tool reference**:
-| 指令 | 用途 |
+| 命令 | 功能 |
 |------|------|
-| `rg "关键词" wiki/ -l` | 搜索包含关键词的文件名列表 |
-| `rg "关键词" wiki/ -C 3` | 搜索并显示3行上下文 |
-| `rg -i "pattern" wiki/` | 大小写不敏感搜索 |
-| `rg "\bword1\b.*\bword2\b" wiki/` | 多关键词联合搜索 |
-| `find wiki -name "*.md"` | 列出所有wiki文件 |
+| `/pm-research <topic>` | 市场/用户/竞品研究：Web 搜索 + wiki 查询 + 综合报告 |
+| `/pm-prd <description>` | 多轮 PRD 生成：发现→wiki 搜索→专家挑战→模板选择→生成→结晶 |
+| `/pm-strategy <product>` | 9 区块策略画布工作坊 |
+| `/pm-release <version>` | 发布 & GTM 规划 |
+| `/pm-quick <task>` | 轻量临时任务（跳过完整生命周期） |
 
-**Search strategy** — always run at least 3 search rounds:
-1. **Keyword extraction**: Extract key terms from user's requirement (产品名、用户角色、功能名、技术概念)
-2. **Entity search**: `rg "商户|支付|交易|客户" wiki/entities/ -l`
-3. **Concept search**: `rg "优先级|安全|增长|策略" wiki/concepts/ -l`
-4. **Cross-reference**: Read entity pages found, follow their 关联 links to concepts
+### 工具命令（4 个）
 
-Report findings in 4 categories:
-```
-✅ Confirmed by wiki: {requirements aligning with existing knowledge}
-⚠️ Conflict with wiki: {requirements contradicting existing data/models}
-🔍 Missing in wiki: {topics wiki has no coverage for}
-💡 Enriched by wiki: {existing concepts that add depth}
-
-Statistics: found {N} entities, {M} concepts, {X} relations
-```
-
-**Round 3 — Expert Challenge**
-Act as product expert. Challenge from these angles:
-1. **Logic check**: Does this make sense given wiki data model?
-   - "You want real-time analytics, but wiki says the pipeline runs T+1."
-2. **Edge cases**: What happens when things go wrong?
-   - "What if a merchant has zero transactions today?"
-3. **Missing pieces**: What's critically needed but not mentioned?
-   - "No permissions mentioned. Should merchants see other merchants' data?"
-4. **Priority check**: Can this be broken into phases? What's truly P0?
-
-Tag each finding: 🚩 Blocker | ⚠️ Risk | 💡 Suggestion
-
-**Round 4 — Gap Analysis**
-Synthesize what's missing:
-- **Information gaps**: What must user provide for a complete PRD?
-- **Design gaps**: What decisions are premature or underspecified?
-
-**GATE — Stop and present summary:**
-```
-## Research Summary
-
-**Product**: {name}
-**Type**: {auto-detected: ToC/ToB/Backend/Mini-Program}
-**Wiki Coverage**: {good/moderate/poor}
-
-### From Wiki
-✅ Confirmed: {items}
-⚠️ Conflicts: {items}
-
-### Risks & Suggestions
-🚩 {blocker}
-⚠️ {risk}
-💡 {suggestion}
-
-### Missing Information
-- {gap}
-
----
-1. Proceed to generate PRD
-2. Address gaps — let me provide more details
-3. Ask more — dig deeper on specific areas
-```
-
-**STOP. WAIT for user choice. Do NOT proceed until user selects "Proceed".**
+| 命令 | 功能 |
+|------|------|
+| `/pm-health [--repair]` | .planning/ 目录完整性检查 + 自动修复 |
+| `/pm-help [command]` | 显示所有命令或特定命令的详细帮助 |
+| `/pm-config [key=value]` | 查看/编辑 .planning/config.json |
+| `/pm-todo [add/list/done]` | 项目 TODO 管理 |
+| `/pm-wiki <op> [args]` | 桥接到 llm-wiki-skill（编译、查询、检查等） |
 
 ---
 
-### Phase 2: Template Selection (GATED)
+## 命令-工作流映射
 
-Present auto-detected template type with confidence and full structure preview.
-Use `question` tool with options: "This template fits" / "Use a different one".
-
-**WAIT for confirmation.**
-
----
-
-### Phase 3: PRD Generation
-
-Write PRD to **project root** (use `LS` to find `prd/` dir, create if needed):
-
-```
-{project_root}/prd/{project-name}/v1/prd.md
-{project_root}/prd/{project-name}/v1/changelog.md
-```
-
-**Rules**:
-- Every section substantive — no `[placeholder]` left
-- Cite wiki: `参见: wiki/entities/xxx.md`
-- Tables with real data, not examples
-- P0/P1/P2 map to a phase roadmap
-- Version header: V1.0, date, "Phase 1"
-
-**Changelog format**:
-```markdown
-# Changelog
-
-## V1.0 ({date})
-- Phase 1: Initial PRD
-- Template: {type}
-- Wiki sources: {N} entities, {M} concepts
-- Key decisions: {summary}
-```
+| 命令 | 加载工作流 | 产出物 |
+|------|-----------|--------|
+| `/pm-init` | `workflows/init-project.md` | PROJECT.md, REQUIREMENTS.md, ROADMAP.md, STATE.md, config.json |
+| `/pm-plan <N>` | `workflows/plan-phase.md` | NN-CONTEXT.md, NN-RESEARCH.md, NN-PRD.md, NN-MM-PLAN.md |
+| `/pm-execute <N>` | `workflows/execute-plan.md` | NN-MM-SUMMARY.md, 交付物, 更新 STATE.md |
+| `/pm-verify <N>` | `workflows/verify-work.md` | NN-VERIFICATION.md |
+| `/pm-transition` | `workflows/transition.md` | 更新 PROJECT.md, ROADMAP.md, STATE.md |
+| `/pm-research` | `workflows/research.md` | RESEARCH.md |
+| `/pm-prd` | `workflows/prd-generation.md` | prd/{name}/v1/prd.md + changelog.md |
+| `/pm-release` | `workflows/release-gtm.md` | RELEASE.md, GTM.md |
+| `/pm-health` | `workflows/health.md` (来自 spec-skill 模式) | 健康报告 + 自动修复 |
+| `/pm-quick` | *(内联轻量)* | 快速计划 + 总结 |
 
 ---
 
-### Phase 4: Crystallization — PRD feeds back to wiki
+## 完整生命周期流程
 
-After PRD is generated, **crystallize** key decisions back into the wiki so
-the knowledge base compounds:
-
-1. For each **new entity** discovered during PRD research (e.g., a feature
-   spec, a user role, a metric not yet in wiki):
-   → Write to `wiki/entities/{name}.md` with source = `prd/{project-name}/v1/prd.md`
-
-2. For each **new concept** synthesized (e.g., an architecture pattern,
-   a design principle derived from this PRD):
-   → Write to `wiki/concepts/{name}.md` with source = `prd/{project-name}/v1/prd.md`
-
-3. Update `wiki/index.md` and `wiki/glossary.md` with new entries.
-
-4. Append to `wiki/log.md`:
-```markdown
-## [YYYY-MM-DD HH:MM] crystallize | prd/{project-name}/v1/prd.md
-- 新建: {N} 实体, {M} 概念
-- 来源: PRD generation session
+```
+/pm-init "产品名称"
+  │  引导式提问（BLOCKING gate）
+  │  创建 PROJECT.md / REQUIREMENTS.md / ROADMAP.md / STATE.md / config.json
+  │  预设阶段类型：发现 → 策略 → PRD → 执行 → 发布
+  ▼
+/pm-plan 1（发现阶段）
+  │  加载上下文 → 阶段讨论（BLOCKING）→ 研究 → 创建 PLAN.md
+  │  BLOCKING gate：确认计划
+  ▼
+/pm-execute 1
+  │  逐任务执行（读取→实现→验证→提交）→ 创建 SUMMARY.md
+  ▼
+/pm-verify 1
+  │  验证 must_haves → 创建 VERIFICATION.md
+  │  BLOCKING gate：确认验证结果
+  ▼
+/pm-transition
+  │  更新 ROADMAP.md（阶段 1 完成）→ STATE.md → 准备阶段 2
+  │  BLOCKING gate：确认切换
+  ▼
+/pm-plan 2（策略阶段）→ /pm-execute 2 → /pm-verify 2 → /pm-transition
+  ...
 ```
 
-This implements v2's core insight: **your explorations are a source,
-just like an article. The wiki should treat them that way.**
+## 阶段类型
+
+PM 项目的阶段类型（在 ROADMAP.md 中定义）：
+
+| 阶段类型 | 典型产出 | 适用命令 |
+|----------|---------|---------|
+| **发现（Discovery）** | 竞品分析、用户画像、市场规模、机会评估 | /pm-research |
+| **策略（Strategy）** | 产品愿景、价值主张、商业模式、OKR | /pm-strategy |
+| **PRD** | 产品需求文档、用户故事、验收标准 | /pm-prd |
+| **执行（Execution）** | Sprint 计划、功能规格、测试用例 | /pm-execute |
+| **发布（Release）** | 发布说明、GTM 计划、上线清单 | /pm-release |
+
+## 与 llm-wiki-skill 集成
+
+pm-skill **不重新实现** wiki 功能，而是通过 `/pm-wiki` 桥接命令委托给 llm-wiki-skill。
+
+**检测逻辑**（在需要 wiki 的工作流中执行）：
+1. 检查当前工作目录是否有 `.wiki/` 目录（llm-wiki-skill 标记）
+2. 检查 `wiki` CLI 是否可用：`which wiki` 或 `python3 -c "import scripts.wiki"`
+3. 如未安装，提示用户：
+
+```
+此功能需要 llm-wiki-skill（专业级 wiki 引擎）。
+安装方法：
+  git clone https://github.com/lgwanai/pm-skill ~/.claude/skills/llm-wiki-skill
+  # 或通过 Claude Code 插件市场安装
+
+安装后，wiki 功能将自动启用。
+```
+
+**集成触点**：
+- `/pm-research` → wiki-query 搜索已有知识，新发现结晶回 wiki
+- `/pm-prd` → wiki-query 验证需求、检测冲突，PRD 决策结晶回 wiki
+- `/pm-strategy` → wiki-query 竞品情报，策略决策结晶回 wiki
+- `/pm-wiki compile/query/lint/status` → 直接委托所有 wiki 操作
+
+详见 `references/wiki-integration.md`。
 
 ---
 
-### Phase 5: Revision (版本管理)
+## 配置
 
-`/prd revise <project-name> <change description>`
+项目配置存储在 `.planning/config.json`。关键设置：
 
-1. Read `prd/{project-name}/` latest version and changelog
-2. Determine new version:
-   - Major revision → V{N+1}.0 (new `prd/{name}/v{N+1}/prd.md`)
-   - Minor revision → V{N}.{M+1} (new `prd/{name}/v{N}.{M+1}/prd.md`)
-3. Apply changes. Each revision = one phase entry in changelog.
+| 设置 | 选项 | 默认值 | 用途 |
+|------|------|--------|------|
+| `mode` | `interactive`, `yolo` | `interactive` | 每步确认 vs. 自动批准 |
+| `granularity` | `coarse`, `standard`, `fine` | `standard` | 阶段粒度（3-5 / 5-8 / 8-12 阶段） |
+| `workflow.research` | boolean | `true` | 规划前进行领域研究 |
+| `workflow.wiki_enabled` | boolean | `true` | 启用 llm-wiki-skill 集成 |
+| `workflow.prd_gates` | boolean | `true` | PRD 生成启用 BLOCKING gates |
+| `gates.confirm_roadmap` | boolean | `true` | 路线图确认 gate |
+
+完整 schema 见 `templates/config.json`。
 
 ---
 
-### Critical Rules
-- **BLOCKING gates are MANDATORY.** NEVER skip from Research to Generation in one turn.
-- **Files at project root**, NOT skill directory. Use LS to confirm location.
-- **Wiki is your source of truth.** If requirement contradicts wiki, FLAG it — don't ignore.
-- **Challenge, don't obey.** Your value is questioning assumptions, not typing fast.
-- Chinese output.
+## 模板 & 模式
+
+所有模板位于 `templates/` 目录。
+
+### 核心规划模板
+- `templates/PROJECT.md` — 产品项目简介（愿景、核心价值、约束、关键决策）
+- `templates/ROADMAP.md` — 产品路线图（阶段分解、成功标准、进度追踪）
+- `templates/STATE.md` — 跨会话状态记忆（位置、决策、阻断项、指标）
+- `templates/REQUIREMENTS.md` — 产品需求（含可追溯性矩阵）
+- `templates/config.json` — 工作流配置
+
+### 阶段执行模板
+- `templates/PLAN.md` — 可执行阶段计划（含 must_haves、XML 任务结构）
+- `templates/SUMMARY.md` — 执行总结
+- `templates/VERIFICATION.md` — 验证报告
+- `templates/RESEARCH.md` — 研究报告
+- `templates/STRATEGY.md` — 9 区块策略画布
+- `templates/TODO.md` — TODO 面板
+
+### PRD 模板
+- `templates/PRD-GENERIC.md` — 通用 PRD 模板（8 章节）
+- `templates/PRD-TOB.md` — ToB/后台产品 PRD 模板
+- `templates/PRD-TOC.md` — ToC/消费产品 PRD 模板
+
+### 发布模板
+- `templates/RELEASE.md` — 发布说明
+- `templates/GTM.md` — Go-to-Market 计划
+
+---
+
+## 工作流文档
+
+- `workflows/init-project.md` — 项目初始化：提问→需求→路线图
+- `workflows/plan-phase.md` — 阶段规划：上下文→讨论→研究→PRD→计划
+- `workflows/execute-plan.md` — 计划执行：读→实现→验证→提交
+- `workflows/verify-work.md` — Must-haves 验证 + 缺口分析
+- `workflows/transition.md` — 阶段完成 + 状态更新
+- `workflows/research.md` — 独立研究流程
+- `workflows/prd-generation.md` — PRD 生成（多轮专家对话）
+- `workflows/release-gtm.md` — 发布 & GTM 流程
+
+## 参考资料
+
+- `references/questioning.md` — 产品发现提问策略（改编自 spec-skill）
+- `references/verification-patterns.md` — PRD/需求验证模式
+- `references/prd-research.md` — PRD 研究方法论（保留自 v2）
+- `references/collect.md` — PRD 模板类型检测规则（保留自 v2）
+- `references/pm-frameworks.md` — PM 框架图谱（综合参考）
+- `references/wiki-integration.md` — llm-wiki-skill 桥接指南
+- `references/domain/` — PM 领域能力参考（发现、策略、研究、GTM）
+
+---
+
+## 关键规则
+
+1. **中文优先**: 所有输出使用中文（保留英文专业术语）。
+2. **BLOCKING gates 强制执行**: 绝对不要在单轮对话中从研究跳到 PRD 生成。
+3. **模板驱动**: 每个产物对应一个模板文件。生成前先读取模板。
+4. **知识积累**: 每次研究/PRD 的结论都应通过 llm-wiki-skill 结晶回知识库。
+5. **挑战用户**: 你是思考伙伴，不是打字员。质疑模糊需求，揭示隐藏假设。
+6. **状态追踪**: 每次关键操作后更新 STATE.md（保持 < 100 行）。
+7. **纯 skill 定义**: 不依赖 Python 脚本。Agent 原生能力（Read, Write, Grep, AskUserQuestion）完成所有操作。

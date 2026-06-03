@@ -19,9 +19,9 @@ SECRET_PATTERNS=(
 
 FOUND=0
 for pattern in "${SECRET_PATTERNS[@]}"; do
-  for f in SKILL.md README.md references/**/*.md; do
+  for f in SKILL.md README.md references/**/*.md references/**/**/*.md commands/**/*.md workflows/*.md templates/*.md templates/*.json; do
     [ -f "$f" ] || continue
-    matched=$(grep -nE "$pattern" "$f" 2>/dev/null | grep -vE '(https?://|gist\.github|github\.com)' || true)
+    matched=$(grep -nE "$pattern" "$f" 2>/dev/null | grep -vE '(https?://|gist\.github|github\.com|\{[a-zA-Z]|^\|.*\{|`.*\{)' || true)
     if [ -n "$matched" ]; then
       echo "  [!] SUSPECT: $f"
       echo "$matched" | head -3
@@ -44,10 +44,11 @@ rm -f "$ZIP"
 zip -r "$ZIP" \
   SKILL.md \
   README.md \
+  commands/ \
+  workflows/ \
+  templates/ \
   references/ \
-  wiki/ \
-  -x "wiki/entities/*.md" "wiki/concepts/*.md" "wiki/index.md" "wiki/glossary.md" "wiki/log.md" \
-  -x "*.pyc" "__pycache__/*" ".git/*" ".DS_Store"
+  -x "*.pyc" "__pycache__/*" ".git/*" ".DS_Store" "*.zip"
 
 SIZE=$(du -h "$ZIP" | cut -f1)
 COUNT=$(unzip -l "$ZIP" | tail -1 | awk '{print $2}')
