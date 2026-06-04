@@ -1,12 +1,23 @@
 ---
 name: pm-research
 description: "执行市场/用户/竞品研究。驱动 deerflow-skill 进行 Web 深度调研，结合 llm-wiki-skill 知识库查询，生成结构化研究报告。"
-argument-hint: "<topic or file>"
+argument-hint: "<topic or file> [--req <id>]"
 ---
 
 # /pm-research — 产品研究
 
 触发 `pm-skill`，执行产品研究并生成结构化报告。
+
+支持两种模式：
+- **宏观研究**：`/pm-research <topic>` — 产品级别的市场/用户/竞品研究
+- **需求调研**：`/pm-research --req <id>` — 针对单条需求的深度调研（委托给 `/pm-req research`）
+
+## 用法
+
+```
+/pm-research "AI 代码审查工具竞品分析"       # 宏观：竞品格局研究
+/pm-research --req REQ-008                    # 微观：单条需求针对性调研
+```
 
 ## 研究引擎
 

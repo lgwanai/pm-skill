@@ -2,16 +2,15 @@
 
 ## 概述
 
-执行已批准的计划文件中的任务。逐任务读取→实现→验证→提交。
+执行已批准的计划文件中的任务。逐任务读取→产出→验证→记录，生成 PM 交付物（研究报告、PRD 文档、策略画布等）。
 
-改编自 spec-skill 的 `workflows/execute-plan.md`，适配 PM 工作场景。
+本工作流专为 PM 场景设计，所有操作围绕**文档撰写、研究分析、策略产出**展开。
 
 ## 前置条件
 
 - PLAN.md 存在且已获用户批准
 - 用户已确认"继续执行"
-- 如 PLAN.md 有 `user_setup`，用户已完成外部配置
-- 工作目录状态干净（或用户明确知晓变更）
+- 如 PLAN.md 有 `user_setup`，用户已完成外部配置（如确认访谈对象、获取数据权限等）
 
 ## 执行步骤
 
@@ -19,39 +18,41 @@
 
 1. 读取 `{NN-MM-PLAN}.md` 到上下文
 2. 确认所有 `depends_on` 的依赖计划已完成
-3. 确认 `user_setup` 中的项目已就绪（如 API 配置、外部账号等）
-4. 确认工作目录状态
+3. 确认 `user_setup` 中的项目已就绪（如数据访问、外部资料等）
+4. 确认阶段目标清晰，产出路径明确
 
 ### 步骤 1：任务执行循环
 
 对于 PLAN.md 中的每个 `<task>`：
 
 ```
-FOR each task in wave order:
-  1. READ FIRST — 读取 <read_first> 中列出的文件
-  2. IMPLEMENT — 执行任务的具体操作
+FOR each task in sequence:
+  1. READ FIRST — 读取 <read_first> 中列出的参考文件
+  2. PRODUCE — 执行任务，产出具体交付物
   3. VERIFY — 逐项检查 <acceptance_criteria>
-  4. COMMIT — 如有 git repo，原子提交
+  4. RECORD — 记录完成状态
 ```
 
-**1. READ FIRST**
+**1. READ FIRST（先读再做）**
 - 读取 `<read_first>` 中的所有文件
-- PM 场景常见：读取研究文档、PRD 模板、参考框架
+- PM 场景常见：读取研究文档、PRD 模板、参考框架、竞品资料
 
-**2. IMPLEMENT**
-- 使用 Write 工具创建/更新文档
-- 使用 WebSearch/WebFetch 进行外部研究
-- 使用 Grep 检查已有内容
+**2. PRODUCE（产出交付物）**
+- 使用 Write 工具创建/更新 PM 文档
+- 使用 WebSearch/WebFetch 进行外部信息搜索
+- 使用 Grep 检查已有内容，避免重复
+- PM 典型产出：研究报告、竞品分析、用户画像、PRD 文档、策略画布、GTM 计划等
 
-**3. VERIFY**
-- 逐项对照 `<acceptance_criteria>` 检查
-- 如果验收标准不满足 → 修复 → 重新验证
+**3. VERIFY（对照验收标准检查）**
+- 逐项对照 `<acceptance_criteria>` 检查产出质量
+- 如果验收标准不满足 → 修正 → 重新验证
 - 最多重试 3 次
+- PM 验收示例：「竞品分析涵盖 5 家直接竞品」「PRD 包含完整的用户故事章节」「研究报告标注了数据来源」
 
-**4. COMMIT**（如有 git repo）
-- 提交消息格式：`{phase}-{plan}: {task-description}`
-- 结尾添加：`Co-Authored-By: Claude Code <noreply@anthropic.com>`
-- 原子提交：一个任务 = 一个 commit
+**4. RECORD（记录完成状态）**
+- 在 STATE.md 中简要记录当前进度
+- 标记已完成的任务
+- 如项目使用 git，可选提交（非强制）
 
 ### 步骤 2：检查点处理
 
@@ -60,6 +61,11 @@ FOR each task in wave order:
 2. 展示当前结果和相关产物
 3. 使用 `AskUserQuestion` 请求用户验证
 4. 等待用户确认后继续
+
+PM 场景常见的检查点：
+- 「竞品分析草稿已完成，请确认分析维度是否覆盖你的关注点」
+- 「PRD 用户故事章节完成，请确认核心场景无遗漏」
+- 「策略画布初稿就绪，请确认定位方向」
 
 ### 步骤 3：执行后处理
 
@@ -71,7 +77,7 @@ FOR each task in wave order:
    phase: {N}
    plan: {MM}
    completed: "{date}"
-   summary: "{一句话总结}"
+   summary: "{一句话总结执行结果}"
    artifacts_created: ["{文件列表}"]
    decisions_made: ["{关键决策}"]
    deviations: ["{与计划的偏差}"]
@@ -87,23 +93,24 @@ FOR each task in wave order:
 ### 步骤 4：计划间切换
 
 如果该阶段有多个计划（01-PLAN.md, 02-PLAN.md）：
-- 完成 01 后，自动询问是否继续执行 02
-- 如果是 Wave 1/2 关系：Wave 1 全部完成 → 再执行 Wave 2
+- 完成 01 后，展示成果摘要，询问是否继续执行 02
+- 如有依赖关系：先完成被依赖的计划，再执行后续计划
+- PM 场景的计划通常是循序渐进的（先研究 → 再策略 → 再 PRD）
 
 ## 错误恢复
 
 **单个任务失败**（< 3 次）：
-- 分析失败原因
-- 修正方法
+- 分析失败原因（信息不足？方向偏差？）
+- 调整方法
 - 重新执行任务
 
 **连续 3 次失败**：
 - 记录问题到 STATE.md 的 Blockers 部分
 - 创建 `.planning/.continue-here.md` checkpoint
-- 向用户汇报并请求指导
+- 向用户汇报问题并请求指导
 
 **上下文溢出**：
-- 完成当前任务并提交
+- 完成当前任务并记录
 - 创建 `.planning/.continue-here.md`：
   ```markdown
   # Continue Here
@@ -117,6 +124,6 @@ FOR each task in wave order:
 
 - 不执行未批准的计划
 - 每个任务独立验证 — 不批量跳过
-- 原子提交，不合并任务
-- 遇到检查点必须暂停
+- 遇到检查点必须暂停，等待用户确认
+- 产出物必须实质化 — 不交付含占位符的文档
 - 中文输出

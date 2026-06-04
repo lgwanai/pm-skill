@@ -119,6 +119,39 @@ wiki lint --auto-heal     # 健康检查
 
 ---
 
+---
+
+## 需求台账（Requirements Ledger）
+
+pm-skill 通过 `/pm-req` 命令将需求作为结构化实体存入 wiki，
+实现需求的全生命周期管理和智能检索。
+
+### 需求实体结构
+
+每条需求存储为 `wiki/entities/REQ-XXX.md`，遵循 `templates/REQUIREMENT-ITEM.md` 模板，
+包含完整 YAML frontmatter：id、title、type、status、priority、source、source_ref、
+phase、related_reqs、conflicts、tags。
+
+### 台账操作映射
+
+| PM 操作 | Wiki 操作 | 说明 |
+|---------|----------|------|
+| `/pm-req generate` | `wiki-query` 查重 + Write 新实体 | 提取需求前先查重，确认后写入实体 |
+| `/pm-req list` | `wiki-query "列出所有需求"` | 语义检索 + 状态筛选 |
+| `/pm-req show <id>` | Read `wiki/entities/REQ-XXX.md` | 读取完整实体 |
+| `/pm-req update <id>` | Edit `wiki/entities/REQ-XXX.md` frontmatter | 更新状态/优先级 |
+| `/pm-req research <id>` | `wiki-query` 竞品信息 + Write 调研报告 | 针对性调研 |
+| `/pm-req dedup` | `wiki-query` 全量语义相似度 | 全量去重扫描 |
+
+### 去重 & 冲突检测
+
+- **标题匹配**（始终执行）：`grep -i "{关键词}" REQUIREMENTS.md`
+- **语义检索**（wiki 可用时）：`wiki query "已有需求中是否有关于 {标题} 的记录？"`
+- **冲突检测**：`wiki query "{需求关键词} 的相反或冲突需求"`
+- **降级方案**：Wiki 不可用时仅做标题关键词匹配
+
+---
+
 ## 最佳实践
 
 1. **定期维护**: 每周运行 `wiki lint --auto-heal`

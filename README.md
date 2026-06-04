@@ -101,7 +101,7 @@ Agent 是你的**思考伙伴**，挑战模糊需求，揭示隐藏假设，而�
 
 ### `/pm-execute <阶段编号>`
 
-**做什么**：执行已批准的计划。逐任务实施、验证、记录。
+**做什么**：执行已批准的计划。逐任务读取、产出、验证、记录。
 
 **什么时候用**：
 - `/pm-plan` 完成且你已确认"继续"后
@@ -115,7 +115,7 @@ Agent 是你的**思考伙伴**，挑战模糊需求，揭示隐藏假设，而�
 **交互过程**：
 1. Agent 读取 PLAN.md，确认所有依赖已就绪
 2. **逐任务执行**：
-   - Task 1: 读取参考文件 → 执行（如"搜索 Top 5 竞品"）→ 对照验收标准验证 → 记录
+   - Task 1: 读取参考文件 → 产出（如「搜索 Top 5 竞品并整理分析」）→ 对照验收标准验证 → 记录进度
    - Task 2: 同上
    - 如果任务标记为 `checkpoint:human-verify` → **暂停等你确认**
 3. 全完成后生成 SUMMARY.md，更新 STATE.md
@@ -127,7 +127,7 @@ Agent 是你的**思考伙伴**，挑战模糊需求，揭示隐藏假设，而�
 实际的交付物文件          # 如竞品分析表、用户画像文档等
 ```
 
-> 每个任务独立验证，不会批量跳过。如果有 git 仓库，每个任务一个原子 commit。
+> 每个任务独立验证，不会批量跳过。产出物必须是实质化文档（无占位符）。
 
 ---
 
@@ -396,6 +396,112 @@ STRATEGY.md             # 完整策略画布（9 个区块 + 待验证假设清�
 RELEASE.md              # 发布说明（用户视角）
 GTM.md                  # GTM 计划（沙滩头、ICP、渠道、倒计时、指标）
 ```
+
+---
+
+### `/pm-req <操作> [参数]`
+
+**做什么**：需求全生命周期管理。从竞品分析、会议纪要、用户输入中提取需求，自动去重和冲突检测，联动 wiki 台账存储，支持状态管理和针对性调研。
+
+**什么时候用**：
+- 竞品分析完成后，想从中提取功能需求
+- 开完产品评审会，需要把讨论的功能点整理成需求列表
+- 用户/老板给了一段文字描述，需要拆解成结构化需求
+- 查看当前所有需求的状态
+- 针对某条具体需求做深度调研
+
+**子命令详解**：
+
+**`/pm-req generate <source-type> <path-or-text>`** — 需求提取 & 入库
+
+从指定来源提取需求，自动去重和冲突检测，写入台账。
+
+来源类型：
+| 类型 | 说明 | 示例 |
+|------|------|------|
+| `competitive-analysis` | 竞品分析报告 | `competitive-analysis .planning/phases/01-discovery/竞品对比分析.md` |
+| `meeting` | 会议纪要 | `meeting docs/meetings/2026-06-05.md` |
+| `user-text` | 用户文字输入 | `user-text "需要微信登录、手机号注册、记住密码"` |
+| `document` | 任意文档 | `document prd/payment/v1/prd.md` |
+
+**交互过程**：
+1. Agent 读取来源内容
+2. 提取候选需求（信号词识别 + 优先级推断）
+3. 去重检查（标题匹配 + wiki 语义检索）
+4. 冲突检测（逻辑矛盾、范围矛盾）
+5. 分三类展示：
+   - ✅ 新增 — 可直接入库
+   - ⚠️ 疑似重复 — 列出相似已有需求，等用户判断
+   - 🚩 冲突 — 标记矛盾，等用户决策
+6. **等待用户确认** → 写入 wiki 台账 + REQUIREMENTS.md
+
+**`/pm-req list [--status=<s>] [--priority=<p>] [--source=<s>]`** — 需求列表
+
+按状态分组展示所有需求，支持多维度筛选。
+
+```
+/pm-req list                        # 全部需求总览
+/pm-req list --status=researching   # 只看调研中的需求
+/pm-req list --priority=P0          # 只看 P0 需求
+/pm-req list --source=meeting       # 只看会议产生的需求
+```
+
+**`/pm-req show <id>`** — 需求详情
+
+展示单条需求的完整信息：描述、用户故事、验收标准、竞品参考、调研记录、变更历史。
+
+**`/pm-req update <id> --status=<s>`** — 状态更新
+
+```
+/pm-req update REQ-008 --status=planned        # 调研完成，纳入规划
+/pm-req update REQ-012 --priority=P0           # 提升优先级
+/pm-req update REQ-015 --status=cancelled       # 明确不做
+```
+
+**`/pm-req research <id>`** — 需求针对性调研
+
+对单条需求进行深度调研（竞品功能实现、用户需求验证、可行性分析），不同于 `/pm-research` 的宏观产品研究。
+
+```
+/pm-req research REQ-008
+# → 调研竞品在该功能上的做法
+# → 验证用户需求强度
+# → 分析可行性
+# → 生成 REQ-008-RESEARCH.md
+# → 自动更新状态: pending → researching
+```
+
+**`/pm-req dedup`** — 全量去重
+
+扫描所有需求，检测疑似重复的需求对，逐对处理。
+
+**需求状态流转**：
+```
+📥 待评审 → 🔍 调研中 → 📋 已规划 → 🚧 研发中 → ✅ 已交付
+                  ↓ 任意状态 ↓
+              ⏸️ 暂缓    ❌ 已取消
+```
+
+**产出物**：
+- `wiki/entities/REQ-XXX.md` — 需求台账实体（如 wiki 可用）
+- 更新的 `REQUIREMENTS.md` — 需求可追溯性矩阵
+- `REQ-XXX-RESEARCH.md` — 需求针对性调研报告
+
+**典型流程示例**：
+```
+/pm-execute 1                          # 完成竞品分析
+/pm-req generate competitive-analysis .planning/phases/01-discovery/竞品对比分析.md
+                                       # 从竞品分析中提取需求
+                                       # Agent 展示候选需求 → 你确认 → 入库
+/pm-req list --status=pending          # 查看待评审需求
+/pm-req research REQ-008               # 对"实时协作编辑"做针对性调研
+/pm-req update REQ-008 --status=planned # 调研完成，纳入 Phase 3 规划
+/pm-req list                           # 查看更新后的需求全景
+```
+
+> **关键规则**：需求提取后 BLOCKING gate 等用户确认；去重不自动合并；冲突不静默覆盖。Wiki 不可用时自动降级，不阻塞工作流。
+
+---
 
 ---
 

@@ -27,19 +27,20 @@ description: "产品经理全生命周期管理助手。覆盖从项目初始化
 |------|------|------|
 | `/pm-init [project-name]` | `/pm-new` | 初始化 PM 项目：引导提问→需求提取→路线图→创建 .planning/ 结构 |
 | `/pm-plan <N>` | `/pm-phase` | 规划阶段 N：加载上下文→阶段讨论→研究→PRD→任务分解→must_haves |
-| `/pm-execute <N>` | `/pm-exec` | 执行阶段 N 的所有计划：逐任务实施→验证→原子提交 |
+| `/pm-execute <N>` | `/pm-exec` | 执行阶段 N 的所有计划：逐任务读取→产出→验证→记录 |
 | `/pm-verify <N>` | `/pm-check` | 验证阶段 N 完成度：must_haves 检查、缺口分析 |
 | `/pm-transition` | `/pm-next-phase` | 完成当前阶段→更新上下文→准备下一阶段 |
 | `/pm-next` | — | 自动检测当前状态，建议/执行下一步 |
 
-### PM 领域工具命令（5 个）
+### PM 领域工具命令（6 个）
 
 | 命令 | 功能 |
 |------|------|
-| `/pm-research <topic>` | 市场/用户/竞品研究：Web 搜索 + wiki 查询 + 综合报告 |
+| `/pm-research <topic>` | 市场/用户/竞品研究：Web 搜索 + wiki 查询 + 综合报告（支持 `--req <id>` 针对性需求调研） |
 | `/pm-prd <description>` | 多轮 PRD 生成：发现→wiki 搜索→专家挑战→模板选择→生成→结晶 |
 | `/pm-strategy <product>` | 9 区块策略画布工作坊 |
 | `/pm-release <version>` | 发布 & GTM 规划 |
+| `/pm-req <generate|list|show|update|research|dedup>` | 需求全生命周期管理：提取→去重→台账存储→状态管理→针对性调研 |
 | `/pm-quick <task>` | 轻量临时任务（跳过完整生命周期） |
 
 ### 工具命令（4 个）
@@ -60,12 +61,13 @@ description: "产品经理全生命周期管理助手。覆盖从项目初始化
 |------|-----------|--------|
 | `/pm-init` | `workflows/init-project.md` | PROJECT.md, REQUIREMENTS.md, ROADMAP.md, STATE.md, config.json |
 | `/pm-plan <N>` | `workflows/plan-phase.md` | NN-CONTEXT.md, NN-RESEARCH.md, NN-PRD.md, NN-MM-PLAN.md |
-| `/pm-execute <N>` | `workflows/execute-plan.md` | NN-MM-SUMMARY.md, 交付物, 更新 STATE.md |
+| `/pm-execute <N>` | `workflows/execute-plan.md` | NN-MM-SUMMARY.md, PM 交付物（研究报告/PRD/策略画布等）, 更新 STATE.md |
 | `/pm-verify <N>` | `workflows/verify-work.md` | NN-VERIFICATION.md |
 | `/pm-transition` | `workflows/transition.md` | 更新 PROJECT.md, ROADMAP.md, STATE.md |
 | `/pm-research` | `workflows/research.md` | RESEARCH.md |
 | `/pm-prd` | `workflows/prd-generation.md` | prd/{name}/v1/prd.md + changelog.md |
 | `/pm-release` | `workflows/release-gtm.md` | RELEASE.md, GTM.md |
+| `/pm-req` | `workflows/requirement-management.md` | wiki/entities/REQ-XXX.md, 更新 REQUIREMENTS.md, REQ-XXX-RESEARCH.md |
 | `/pm-health` | `workflows/health.md` (来自 spec-skill 模式) | 健康报告 + 自动修复 |
 | `/pm-quick` | *(内联轻量)* | 快速计划 + 总结 |
 
@@ -84,7 +86,10 @@ description: "产品经理全生命周期管理助手。覆盖从项目初始化
   │  BLOCKING gate：确认计划
   ▼
 /pm-execute 1
-  │  逐任务执行（读取→实现→验证→提交）→ 创建 SUMMARY.md
+  │  逐任务执行（读取→产出→验证→记录）→ 生成 SUMMARY.md
+  │  ├── /pm-req generate competitive-analysis <报告路径>  ← 从竞品分析提取需求
+  │  ├── /pm-req research <id>                            ← 针对性需求调研
+  │  └── /pm-req list                                      ← 查看需求全景
   ▼
 /pm-verify 1
   │  验证 must_haves → 创建 VERIFICATION.md
@@ -96,6 +101,9 @@ description: "产品经理全生命周期管理助手。覆盖从项目初始化
   ▼
 /pm-plan 2（策略阶段）→ /pm-execute 2 → /pm-verify 2 → /pm-transition
   ...
+
+📋 并行需求管理轨道（贯穿所有阶段）:
+  /pm-req generate <source> → /pm-req list → /pm-req research <id> → /pm-req update <id>
 ```
 
 ## 阶段类型
@@ -107,7 +115,7 @@ PM 项目的阶段类型（在 ROADMAP.md 中定义）：
 | **发现（Discovery）** | 竞品分析、用户画像、市场规模、机会评估 | /pm-research |
 | **策略（Strategy）** | 产品愿景、价值主张、商业模式、OKR | /pm-strategy |
 | **PRD** | 产品需求文档、用户故事、验收标准 | /pm-prd |
-| **执行（Execution）** | Sprint 计划、功能规格、测试用例 | /pm-execute |
+| **执行（Execution）** | 里程碑规划、功能规格、风险预案 | /pm-execute |
 | **发布（Release）** | 发布说明、GTM 计划、上线清单 | /pm-release |
 
 ## 与 llm-wiki-skill 集成
@@ -244,7 +252,7 @@ pm-skill **不重新实现** Web 研究能力，而是通过 `/pm-research` 等�
 
 - `workflows/init-project.md` — 项目初始化：提问→需求→路线图
 - `workflows/plan-phase.md` — 阶段规划：上下文→讨论→研究→PRD→计划
-- `workflows/execute-plan.md` — 计划执行：读→实现→验证→提交
+- `workflows/execute-plan.md` — 计划执行：读取→产出→验证→记录
 - `workflows/verify-work.md` — Must-haves 验证 + 缺口分析
 - `workflows/transition.md` — 阶段完成 + 状态更新
 - `workflows/research.md` — 独立研究流程

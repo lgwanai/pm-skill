@@ -77,7 +77,13 @@
     "_require_wiki_citations_comment": "PRD 中要求引用 wiki 来源（如 wiki 可用）",
 
     "require_competitor_analysis": true,
-    "_require_competitor_analysis_comment": "策略阶段要求竞品分析"
+    "_require_competitor_analysis_comment": "策略阶段要求竞品分析",
+
+    "requirement_dedup_threshold": 0.7,
+    "_requirement_dedup_threshold_comment": "需求去重相似度阈值（0-1）。超过此阈值的需求对标记为疑似重复。",
+
+    "requirement_wiki_storage": true,
+    "_requirement_wiki_storage_comment": "需求存储到 wiki 台账（需 llm-wiki-skill）。false 时仅存储在 REQUIREMENTS.md。"
   },
 
   "phases": {

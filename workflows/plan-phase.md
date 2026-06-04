@@ -5,6 +5,8 @@
 为特定阶段创建可执行计划。加载上下文、进行阶段讨论、执行研究、分解任务，
 生成含 must_haves 的 PLAN.md。
 
+本工作流专为 PM 场景设计，覆盖发现、策略、PRD、执行规划、发布 GTM 等 PM 阶段类型。
+
 ## 前置条件
 
 - `.planning/` 目录存在且完整
@@ -83,19 +85,23 @@ mkdir -p .planning/phases/{NN-name}/
 - 用户故事编写（INVEST 标准）
 - 功能优先级排序（P0/P1/P2）
 - 验收标准定义
-- 技术约束澄清
+- 边界情况分析
 - Wiki 搜索：验证需求、检测冲突
 
-**执行阶段**：
-- Sprint 规划
-- 任务分解和依赖分析
-- 测试场景设计
+**执行规划阶段**：
+- 将 PRD 需求转化为可执行的功能规格
+- 里程碑 & 发布节奏规划
+- 关键路径识别 & 风险分析
+- 跨团队协作接口定义（设计、开发、测试的交付节奏）
+- PM 产出：功能规格文档、里程碑路线图、风险清单
 
 **发布阶段** — 参考 `references/domain/gtm-patterns.md`：
 - 滩头阵地细分分析
 - ICP 定义
+- 消息 & 价值主张设计
 - GTM 渠道分析
 - 发布倒计时规划
+- 成功指标定义
 
 **研究产物**：创建 `NN-RESEARCH.md`（遵循 `templates/RESEARCH.md`）：
 - 研究问题
@@ -119,12 +125,11 @@ mkdir -p .planning/phases/{NN-name}/
 phase: {N}
 plan: {MM}
 phase_name: "{name}"
-phase_type: "{discovery|strategy|PRD|execution|release}"
-wave: {1|2|3}
+phase_type: "{discovery|strategy|prd|execution|release}"
 depends_on: []
 must_haves:
   truths:
-    - "{可观察的产品事实}"
+    - "{可验证的产品事实}"
   artifacts:
     - "{必须存在的文件}"
   key_links:
@@ -143,8 +148,8 @@ user_setup: []
 <description>{具体可执行的任务描述}</description>
 <read_first>{开始前必须阅读的文件，逗号分隔}</read_first>
 <acceptance_criteria>
-- {可 grep 验证的完成条件 1}
-- {可 grep 验证的完成条件 2}
+- {可检查的完成条件 1}
+- {可检查的完成条件 2}
 </acceptance_criteria>
 <produces>{产出的文件列表}</produces>
 </task>
@@ -155,22 +160,23 @@ user_setup: []
 </tasks>
 
 <dependencies>
-- {MM}-PLAN.md: depends_on [{dep}], files_modified [{files}]
+- {MM}-PLAN.md: depends_on [{dep}], produces [{files}]
 </dependencies>
 </plan>
 ```
 
 **任务设计原则**：
 - 2-3 个任务/计划，~50% 上下文上限
-- 优先纵向切片（端到端完整交付物）
-- 每个任务有明确的验收标准（可 grep 验证）
+- 优先纵向完整（端到端交付物，如「完整的竞品分析报告」）
+- 每个任务有明确的验收标准（可快速判断通过/不通过）
 - 区分 `type="auto"`（Agent 自动执行）和 `checkpoint:human-verify`（需要用户确认）
 - `produces` 列出具体文件路径
+- PM 任务按逻辑顺序排列（先采集 → 再分析 → 再撰写）
 
 **Must_haves 设计**：
-- **truths**：可观察的产品事实（如"竞品分析涵盖 Top 5 竞品"）
-- **artifacts**：必须存在且实质化的文件（如"RESEARCH.md 存在，≥ 50 行"）
-- **key_links**：产物间的关键关联（如"PRD 的用户故事引用 RESEARCH.md 中的用户画像"）
+- **truths**：可验证的产品事实或结论（如"竞品分析涵盖 Top 5 竞品，每家含定价和功能对比"）
+- **artifacts**：必须存在且实质化的文件（如"RESEARCH.md 存在，≥ 50 行，含数据来源引用"）
+- **key_links**：产物间的关键关联（如"PRD 的用户故事引用 RESEARCH.md 中的用户画像数据"）
 
 ### 步骤 4：审查（BLOCKING）
 
