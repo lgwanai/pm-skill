@@ -32,6 +32,7 @@ argument-hint: "[command]"
 /pm-prd <description>        多轮 PRD 生成
 /pm-strategy <product>       策略画布工作坊
 /pm-release <version>        发布 & GTM 规划
+/pm-ui <desc> --design <S>   UI 原型生成（需指定设计规范）
 /pm-quick <task>             轻量临时任务
 
 ### 工具命令

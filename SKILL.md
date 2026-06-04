@@ -1,6 +1,6 @@
 ---
 name: pm-skill
-description: "产品经理全生命周期管理助手。覆盖从项目初始化、产品发现、策略制定、PRD 生成、执行规划到发布上线的完整工作流。命令：/pm-init, /pm-plan, /pm-execute, /pm-verify, /pm-transition, /pm-next, /pm-research, /pm-prd, /pm-strategy, /pm-release, /pm-quick, /pm-health, /pm-help, /pm-config, /pm-todo, /pm-wiki。集成 deerflow-skill（Web 研究引擎）和 llm-wiki-skill（知识库引擎）提供专业级调研和知识管理能力。"
+description: "产品经理全生命周期管理助手。覆盖从项目初始化、产品发现、策略制定、PRD 生成、执行规划到发布上线的完整工作流。命令：/pm-init, /pm-plan, /pm-execute, /pm-verify, /pm-transition, /pm-next, /pm-research, /pm-prd, /pm-strategy, /pm-release, /pm-req, /pm-ui, /pm-quick, /pm-health, /pm-help, /pm-config, /pm-todo, /pm-wiki。集成 deerflow-skill（Web 研究引擎）和 llm-wiki-skill（知识库引擎）提供专业级调研和知识管理能力。"
 ---
 
 # PM Skill — 产品经理全生命周期管理助手
@@ -41,6 +41,7 @@ description: "产品经理全生命周期管理助手。覆盖从项目初始化
 | `/pm-strategy <product>` | 9 区块策略画布工作坊 |
 | `/pm-release <version>` | 发布 & GTM 规划 |
 | `/pm-req <generate|list|show|update|research|dedup>` | 需求全生命周期管理：提取→去重→台账存储→状态管理→针对性调研 |
+| `/pm-ui <desc> --design <spec> [--adjust <file>]` | UI 原型生成：根据需求/阶段生成 HTML 原型，严格遵守设计规范，支持迭代调整 |
 | `/pm-quick <task>` | 轻量临时任务（跳过完整生命周期） |
 
 ### 工具命令（4 个）
@@ -68,6 +69,7 @@ description: "产品经理全生命周期管理助手。覆盖从项目初始化
 | `/pm-prd` | `workflows/prd-generation.md` | prd/{name}/v1/prd.md + changelog.md |
 | `/pm-release` | `workflows/release-gtm.md` | RELEASE.md, GTM.md |
 | `/pm-req` | `workflows/requirement-management.md` | wiki/entities/REQ-XXX.md, 更新 REQUIREMENTS.md, REQ-XXX-RESEARCH.md |
+| `/pm-ui` | `workflows/ui-prototype.md` | prototypes/{name}.html |
 | `/pm-health` | `workflows/health.md` (来自 spec-skill 模式) | 健康报告 + 自动修复 |
 | `/pm-quick` | *(内联轻量)* | 快速计划 + 总结 |
 

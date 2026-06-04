@@ -230,7 +230,7 @@ Agent 是你的**思考伙伴**，挑战模糊需求，揭示隐藏假设，而�
 
 ---
 
-### 二、PM 领域工具（5 个命令）
+### 二、PM 领域工具（7 个命令）
 
 这些命令可独立使用，也可嵌入生命周期流程。
 
@@ -503,6 +503,70 @@ GTM.md                  # GTM 计划（沙滩头、ICP、渠道、倒计时、�
 
 ---
 
+### `/pm-ui <描述 | --req <id>> --design <规范> [--adjust <文件>]`
+
+**做什么**：根据需求、需求编号或阶段描述生成 HTML 原型。**设计规范是必选项**——每个颜色、字体、圆角、间距、阴影都必须来自规范文件。
+
+**三种模式**：
+
+| 模式 | 用法 | 说明 |
+|------|------|------|
+| **需求驱动**（推荐⭐） | `--req <id> --design <spec>` | 先检索 wiki 历史页面和相关功能，确认后生成——最智能 |
+| 直接描述 | `"描述" --design <spec>` | 从文字描述直接生成 |
+| 调整已有 | `--adjust <file> --design <spec>` | 在已有原型上增量修改 |
+
+**设计规范**：
+
+`--design` 参数指向 `design/` 目录下的规范文件：
+
+| `--design` 值 | 对应文件 | 描述 |
+|---------------|---------|------|
+| `apple` | `design/DESIGN-apple.md` | Apple 风格——SF Pro 字体、Action Blue 单强调色、全幅磁贴布局 |
+
+> 新增规范只需将 `.md` 文件放入 `design/` 目录，即可通过 `--design <文件名不含 .md>` 引用。
+
+**使用示例**：
+
+```
+# 需求驱动（推荐）
+/pm-ui --req REQ-008 --design apple              # wiki 检索 → 确认 → 生成
+
+# 直接描述
+/pm-ui "用户注册页" --design apple
+/pm-ui "phase-1 核心页面" --design apple --output prototypes/v2
+
+# 调整已有
+/pm-ui "增加搜索栏和筛选面板" --design apple --adjust prototypes/dashboard.html
+```
+
+**需求驱动模式交互过程**（`--req`——5 步，含 1 个 BLOCKING gate）：
+
+1. **加载需求** — 从 wiki 台账读取需求详情（描述、用户故事、验收标准、关联功能）
+2. **检索历史上下文** — wiki 搜索历史页面/界面 + 扫描已有原型文件 + 读取 PRD 上下文
+3. **展示研究报告（BLOCKING Gate）** — 综合展示：需求概要 + 历史功能 + 已有原型匹配度 + 生成方案（调整 vs 新建）→ **等待你决策**
+4. **执行生成** — 用户选择后：调整已有原型（确认变更后增量修改）或 创建新原型（融入历史 UI 模式和关联功能）
+5. **输出 & 关联** — 写入 `prototypes/{name}.html`，反向更新 wiki 需求条目记录原型路径
+
+**设计约束（硬约束）**：
+
+- ✅ 所有颜色值必须可追溯到规范 Token
+- ✅ 所有字体规格必须使用规范 typography Token
+- ✅ 所有圆角值必须来自规范 rounded Token
+- ✅ 阴影使用严格遵守规范（如 Apple 只有 1 个产品阴影）
+- ❌ 禁止自创颜色、字体、圆角、阴影
+- ❌ 禁止装饰性渐变（除非规范明确定义）
+- ❌ 禁止跳过研究步骤盲目生成（--req 模式）
+
+**产出物**：
+
+```
+prototypes/
+└── dashboard.html       # 独立 HTML 文件（内联 CSS + JS，无外部依赖）
+    # 内含元数据注释：设计规范名、生成时间、需求描述、关联需求编号、历史功能参考
+```
+
+---
+
 ---
 
 ### `/pm-quick <任务描述>`
@@ -577,7 +641,7 @@ Phase 2: ⚠️ Plans(1) ✅ Summary ❌ Verified
 **使用示例**：
 
 ```
-/pm-help                # 显示全部 15 个命令
+/pm-help                # 显示全部 18 个命令
 /pm-help init           # 显示 /pm-init 的详细工作流和示例
 /pm-help prd            # 显示 /pm-prd 的完整 5 Phase 交互过程
 ```
@@ -729,11 +793,14 @@ cd ~/.claude/skills/llm-wiki-skill && pip install -e .
 
 ```
 pm-skill/
-├── SKILL.md                       # 主定义：15 个命令 + 完整工作流
+├── SKILL.md                       # 主定义：18 个命令 + 完整工作流
 ├── README.md                      # 本文档
 ├── package.sh                     # 打包分发脚本
 │
-├── commands/pm/                   # 16 个斜杠命令
+├── design/                        # 设计规范
+│   └── DESIGN-apple.md            # Apple 风格设计规范（色彩/字体/组件/布局）
+│
+├── commands/pm/                   # 18 个斜杠命令
 │   ├── init.md                    # /pm-init — 初始化项目
 │   ├── plan.md                    # /pm-plan — 规划阶段
 │   ├── execute.md                 # /pm-execute — 执行阶段
@@ -744,6 +811,7 @@ pm-skill/
 │   ├── prd.md                     # /pm-prd — PRD 生成
 │   ├── strategy.md                # /pm-strategy — 策略工作坊
 │   ├── release.md                 # /pm-release — 发布规划
+│   ├── ui.md                      # /pm-ui — UI 原型生成
 │   ├── quick.md                   # /pm-quick — 快速任务
 │   ├── health.md                  # /pm-health — 健康检查
 │   ├── help.md                    # /pm-help — 命令帮助
@@ -751,7 +819,7 @@ pm-skill/
 │   ├── todo.md                    # /pm-todo — TODO 管理
 │   └── wiki.md                    # /pm-wiki — Wiki 桥接
 │
-├── workflows/                     # 8 个工作流（Agent 按步执行）
+├── workflows/                     # 10 个工作流（Agent 按步执行）
 │   ├── init-project.md            # 引导提问 → .planning/ 结构
 │   ├── plan-phase.md              # 上下文加载 → 讨论 → 研究 → PLAN.md
 │   ├── execute-plan.md            # 读 → 实现 → 验证 → 提交
@@ -759,6 +827,8 @@ pm-skill/
 │   ├── transition.md              # 阶段完成 → 状态更新
 │   ├── research.md                # 多源搜索 → 综合 → 报告
 │   ├── prd-generation.md          # 4 轮对话 + 专家挑战 + 结晶
+│   ├── requirement-management.md  # 需求提取 → 去重 → 台账 → 状态管理
+│   ├── ui-prototype.md            # 加载规范 → 组件映射 → 生成 HTML → 合规检查
 │   └── release-gtm.md             # 发布说明 → GTM 渠道 → 倒计时
 │
 ├── templates/                     # 15 个输出模板 + config.json
@@ -863,7 +933,7 @@ cd ~/.claude/skills/llm-wiki-skill && pip install -e .
 | — | `/pm-init` → `/pm-plan` → `/pm-execute` → `/pm-verify` → `/pm-transition` |
 | — | `/pm-research`、`/pm-strategy`、`/pm-release`、`/pm-quick` |
 | — | `.planning/` 目录约定、STATE.md 跨会话状态、BLOCKING gates |
-| SKILL.md 单体 (~370 行) | SKILL.md + 16 commands/ + 8 workflows/ + 16 templates/ + 10 references/ |
+| SKILL.md 单体 (~370 行) | SKILL.md + 18 commands/ + 10 workflows/ + 16 templates/ + 10 references/ + design/ |
 
 ---
 
