@@ -48,6 +48,7 @@ zip -r "$ZIP" \
   workflows/ \
   templates/ \
   references/ \
+  design/ \
   -x "*.pyc" "__pycache__/*" ".git/*" ".DS_Store" "*.zip"
 
 SIZE=$(du -h "$ZIP" | cut -f1)
